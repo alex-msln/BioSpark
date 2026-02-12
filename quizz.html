@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BioSpark | Quiz</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --bg-body: #ffffff;
+            --text-main: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            
+            --accent-color: #0e7490; 
+            
+            --progress-solid: #06b6d4; 
+            --progress-track: #ecfeff;
+
+            --accent-success: #16a34a;
+            --accent-error: #dc2626;
+            
+            --border-light: #f1f5f9;
+            --border-medium: #e2e8f0;
+            
+            --font-stack: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-stack);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 5vw; 
+            background: rgba(255, 255, 255, 0.98);
+            border-bottom: 1px solid var(--border-medium);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .brand {
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        nav {
+            max-width: 100%; 
+            overflow-x: auto; 
+            overflow-y: hidden; 
+            touch-action: pan-x; 
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+            white-space: nowrap; 
+        }
+        nav::-webkit-scrollbar { display: none; }
+
+        nav ul {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            padding: 5px 0; margin: 0;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #9ca3af; 
+            font-size: 0.85rem;
+            font-weight: 500; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        nav a:hover, nav a.nav-active { color: var(--text-main); }
+        nav a::after {
+            content: ''; position: absolute; width: 0; height: 2px;
+            bottom: -4px; left: 0; background-color: var(--text-main);
+            transition: width 0.3s;
+        }
+        nav a:hover::after, nav a.nav-active::after { width: 100%; }
+
+        .progress-line {
+            position: fixed;
+            top: 73px;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            z-index: 999;
+            background-color: var(--progress-track); 
+            border-bottom: 1px solid rgba(0,0,0,0.02);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background-color: var(--progress-solid);
+            transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        main {
+            padding: 80px 5vw;
+            width: 100%;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .page-intro {
+            margin-bottom: 70px;
+        }
+
+        .page-intro h1 {
+            font-size: clamp(2.2rem, 5vw, 3.2rem);
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            margin-bottom: 15px;
+            color: var(--text-main);
+            line-height: 1.1;
+        }
+
+        .page-intro p {
+            color: var(--text-secondary);
+            font-size: 1.15rem;
+            line-height: 1.6;
+            max-width: 600px;
+        }
+
+        .quiz-section {
+            margin-bottom: 90px;
+        }
+
+        .section-header {
+            margin-bottom: 35px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-medium);
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-main);
+            border-left: 5px solid var(--accent-color);
+            padding-left: 15px;
+            line-height: 1;
+        }
+
+        .question-block {
+            padding: 25px 0;
+            border-bottom: 1px solid var(--border-light);
+            transition: background-color 0.2s;
+        }
+        
+        .question-block:hover { background: #f8fafc; }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+        
+        .q-num {
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 12px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border: 1px solid var(--border-medium);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            background: #fff;
+            color: var(--text-secondary);
+        }
+
+        .option-label:hover {
+            border-color: var(--text-main);
+            background: #f1f5f9;
+            color: var(--text-main);
+        }
+
+        input[type="radio"] {
+            margin-right: 12px;
+            accent-color: var(--text-main);
+            width: 1.1em; height: 1.1em;
+        }
+
+        .option-label:has(input:checked) {
+            border-color: var(--text-main);
+            background: var(--text-main);
+            color: white;
+        }
+
+        .fill-input {
+            border: none;
+            border-bottom: 2px solid var(--border-medium);
+            background: transparent;
+            font-family: inherit;
+            font-size: 1.1rem;
+            color: var(--accent-color);
+            font-weight: 700;
+            padding: 0 5px;
+            width: 150px;
+            text-align: center;
+            transition: border-color 0.3s;
+            border-radius: 0;
+        }
+        .fill-input:focus {
+            outline: none;
+            border-bottom-color: var(--progress-solid);
+        }
+
+        .match-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 0;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .match-organ {
+            font-weight: 700;
+            width: 130px;
+            font-size: 1.05rem;
+            color: var(--text-main);
+        }
+
+        .match-select {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid var(--border-medium);
+            border-radius: 4px;
+            background-color: #fff;
+            color: var(--text-main);
+            font-family: inherit;
+            cursor: pointer;
+        }
+        .match-select:focus { outline: none; border-color: var(--progress-solid); }
+
+        .correction-box {
+            margin-top: 12px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .status-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .correct-msg { color: var(--accent-success); font-weight: 600; }
+        .wrong-msg { color: var(--accent-error); }
+        .wrong-msg b { color: var(--text-main); font-weight: 700; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
+
+        .action-bar {
+            margin-top: 40px;
+            text-align: center;
+            padding-bottom: 100px;
+        }
+
+        .btn-check {
+            background-color: var(--text-main);
+            color: #fff;
+            border: none;
+            padding: 18px 45px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 4px;
+        }
+        .btn-check:hover {
+            background-color: var(--progress-solid);
+            transform: translateY(-2px);
+        }
+
+        .result-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: none;
+            justify-content: center; align-items: center;
+            flex-direction: column;
+        }
+        .result-score { font-size: 6rem; font-weight: 900; color: var(--text-main); line-height: 1; margin-bottom: 10px; }
+        .result-text { font-size: 1.5rem; color: var(--text-secondary); margin-bottom: 30px; }
+
+        @media screen and (max-width: 700px) {
+            header {
+                flex-direction: column;   
+                align-items: center;      
+                gap: 15px;               
+                padding-bottom: 15px;
+            }
+            
+            nav { width: 100%; }
+            nav ul { 
+                justify-content: space-between; 
+                padding: 0 10px;
+                gap: 20px;
+            }
+
+            .options-grid { grid-template-columns: 1fr; }
+            .match-row { flex-direction: column; align-items: stretch; gap: 8px; background: #f8fafc; padding: 15px; border-radius: 8px; }
+            .fill-input { width: 100%; text-align: left; }
+            .section-title { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand" onclick="window.location.href='index.html'">BioSpark</div>
+        <nav id="mainNav">
+            <ul>
+                <li><a href="index.html">Atlas</a></li>
+                <li><a href="enciclopedie.html">Enciclopedie</a></li>
+                <li><a href="quizz.html" class="nav-active">Quizz</a></li>
+                <li><a href="laborator.html">Laborator</a></li>
+                <li><a href="simptome.html">Simptome</a></li>
+                <li><a href="sanatate.html">Sănătate</a></li>
+                <li><a href="curiozitati.html">Curiozități</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="progress-line"><div class="progress-fill" id="progBar"></div></div>
+
+    <main>
+        <div class="page-intro">
+            <h1>Test de Cunoștințe</h1>
+            <p>Completează testul de mai jos. Răspunsurile sunt analizate semantic, iar diacriticele nu sunt obligatorii.</p>
+        </div>
+
+        <form id="quizForm">
+
+            <div class="quiz-section">
+                <div class="section-header">
+                    <h2 class="section-title">Alegere Multiplă</h2>
+                </div>
+
+                <div class="question-block" id="q1">
+                    <div class="question-text"><span class="q-num">1.</span> Care parte a creierului coordonează motricitatea fină și echilibrul?</div>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="q1" value="A"> Hipocamp</label>
+                        <label class="option-label"><input type="radio" name="q1" value="B"> Cerebel</label>
+                        <label class="option-label"><input type="radio" name="q1" value="C"> Trunchi cerebral</label>
+                        <label class="option-label"><input type="radio" name="q1" value="D"> Amigdala</label>
+                    </div>
+                    <div class="correction-area"></div>
+                </div>
+
+                <div class="question-block" id="q2">
+                    <div class="question-text"><span class="q-num">2.</span> Ce organ produce atât enzime digestive cât și hormoni care reglează glicemia?</div>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="q2" value="A"> Ficat</label>
+                        <label class="option-label"><input type="radio" name="q2" value="B"> Pancreas</label>
+                        <label class="option-label"><input type="radio" name="q2" value="C"> Rinichi</label>
+                        <label class="option-label"><input type="radio" name="q2" value="D"> Stomac</label>
+                    </div>
+                    <div class="correction-area"></div>
+                </div>
+
+                <div class="question-block" id="q3">
+                    <div class="question-text"><span class="q-num">3.</span> Care organ transportă oxigenul din aer în sânge și elimină dioxidul de carbon?</div>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="q3" value="A"> Plămâni</label>
+                        <label class="option-label"><input type="radio" name="q3" value="B"> Inimă</label>
+                        <label class="option-label"><input type="radio" name="q3" value="C"> Intestin subțire</label>
+                        <label class="option-label"><input type="radio" name="q3" value="D"> Creier</label>
+                    </div>
+                    <div class="correction-area"></div>
+                </div>
+
+                <div class="question-block" id="q4">
+                    <div class="question-text"><span class="q-num">4.</span> Care organ este responsabil pentru absorbția majorității nutrienților din alimente?</div>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="q4" value="A"> Intestin subțire</label>
+                        <label class="option-label"><input type="radio" name="q4" value="B"> Stomac</label>
+                        <label class="option-label"><input type="radio" name="q4" value="C"> Plămâni</label>
+                        <label class="option-label"><input type="radio" name="q4" value="D"> Ficat</label>
+                    </div>
+                    <div class="correction-area"></div>
+                </div>
+
+                <div class="question-block" id="q5">
+                    <div class="question-text"><span class="q-num">5.</span> Care organ pompează sângele oxigenat către corp și sângele neoxigenat către plămâni?</div>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="q5" value="A"> Plămâni</label>
+                        <label class="option-label"><input type="radio" name="q5" value="B"> Creier</label>
+                        <label class="option-label"><input type="radio" name="q5" value="C"> Inimă</label>
+                        <label class="option-label"><input type="radio" name="q5" value="D"> Rinichi</label>
+                    </div>
+                    <div class="correction-area"></div>
+                </div>
+
+                <div class="question-block" id="q6">
+                    <div class="question-text"><span class="q-num">6.</span> Ce organ protejează organele interne și produce celule sanguine?</div>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="q6" value="A"> Plămâni</label>
+                        <label class="option-label"><input type="radio" name="q6" value="B"> Schelet / Oase</label>
+                        <label class="option-label"><input type="radio" name="q6" value="C"> Stomac</label>
+                        <label class="option-label"><input type="radio" name="q6" value="D"> Ficat</label>
+                    </div>
+                    <div class="correction-area"></div>
+                </div>
+            </div>
+
+            <div class="quiz-section">
+                <div class="section-header">
+                    <h2 class="section-title">Adevărat sau Fals</h2>
+                </div>
+
+                <div class="question-block" id="tf1">
+                    <div class="question-text"><span class="q-num">1.</span> Creierul consumă aproximativ 20% din oxigenul organismului.</div>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="tf1" value="true"> Adevărat</label>
+                        <label class="option-label"><input type="radio" name="tf1" value="false"> Fals</label>
+                    </div>
+                    <div class="correction-area"></div>
+                </div>
+
+                <div class="question-block" id="tf2">
+                    <div class="question-text"><span class="q-num">2.</span> Ficatul produce bila, necesară digestiei grăsimilor.</div>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="tf2" value="true"> Adevărat</label>
+                        <label class="option-label"><input type="radio" name="tf2" value="false"> Fals</label>
+                    </div>
+                    <div class="correction-area"></div>
+                </div>
+
+                <div class="question-block" id="tf3">
+                    <div class="question-text"><span class="q-num">3.</span> Inima pompează sângele doar către plămâni.</div>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="tf3" value="true"> Adevărat</label>
+                        <label class="option-label"><input type="radio" name="tf3" value="false"> Fals</label>
+                    </div>
+                    <div class="correction-area"></div>
+                </div>
+
+                <div class="question-block" id="tf4">
+                    <div class="question-text"><span class="q-num">4.</span> Pancreasul produce enzime pentru digestia proteinelor, lipidelor și carbohidraților.</div>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="tf4" value="true"> Adevărat</label>
+                        <label class="option-label"><input type="radio" name="tf4" value="false"> Fals</label>
+                    </div>
+                    <div class="correction-area"></div>
+                </div>
+
+                <div class="question-block" id="tf5">
+                    <div class="question-text"><span class="q-num">5.</span> Scheletul contribuie la mișcare și protecția organelor interne.</div>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="tf5" value="true"> Adevărat</label>
+                        <label class="option-label"><input type="radio" name="tf5" value="false"> Fals</label>
+                    </div>
+                    <div class="correction-area"></div>
+                </div>
+
+                <div class="question-block" id="tf6">
+                    <div class="question-text"><span class="q-num">6.</span> Plămânii conțin aproximativ 300–500 milioane de alveole.</div>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="tf6" value="true"> Adevărat</label>
+                        <label class="option-label"><input type="radio" name="tf6" value="false"> Fals</label>
+                    </div>
+                    <div class="correction-area"></div>
+                </div>
+
+                <div class="question-block" id="tf7">
+                    <div class="question-text"><span class="q-num">7.</span> Vezica urinară are rolul de a filtra sângele și de a produce urina.</div>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="tf7" value="true"> Adevărat</label>
+                        <label class="option-label"><input type="radio" name="tf7" value="false"> Fals</label>
+                    </div>
+                    <div class="correction-area"></div>
+                </div>
+            </div>
+
+            <div class="quiz-section">
+                <div class="section-header">
+                    <h2 class="section-title">Completează Spațiile</h2>
+                </div>
+                
+                <div class="question-block" id="fb1">
+                    <div class="question-text">
+                        <span class="q-num">1.</span> Cortexul cerebral este responsabil pentru 
+                        <input type="text" class="fill-input" name="fb1a" placeholder="funcție...">, 
+                        <input type="text" class="fill-input" name="fb1b" placeholder="funcție..."> și 
+                        <input type="text" class="fill-input" name="fb1c" placeholder="funcție...">.
+                    </div>
+                    <div class="correction-area"></div>
+                </div>
+
+                <div class="question-block" id="fb2">
+                    <div class="question-text"><span class="q-num">2.</span> Spermatozoizii sunt depozitați și maturizați în <input type="text" class="fill-input" name="fb2" placeholder="organ...">.</div>
+                    <div class="correction-area"></div>
+                </div>
+
+                <div class="question-block" id="fb3">
+                    <div class="question-text"><span class="q-num">3.</span> Plămânii conțin aproximativ <input type="text" class="fill-input" name="fb3" placeholder="număr..."> milioane de alveole.</div>
+                    <div class="correction-area"></div>
+                </div>
+
+                <div class="question-block" id="fb4">
+                    <div class="question-text"><span class="q-num">4.</span> Pancreasul produce hormonul <input type="text" class="fill-input" name="fb4" placeholder="hormon...">, care reglează glicemia.</div>
+                    <div class="correction-area"></div>
+                </div>
+
+                <div class="question-block" id="fb5">
+                    <div class="question-text"><span class="q-num">5.</span> Femurul este cel mai <input type="text" class="fill-input" name="fb5" placeholder="adjectiv..."> os din corpul uman.</div>
+                    <div class="correction-area"></div>
+                </div>
+
+                <div class="question-block" id="fb6">
+                    <div class="question-text"><span class="q-num">6.</span> Stomacul transformă alimentele în <input type="text" class="fill-input" name="fb6" placeholder="substanță..."> pentru a fi digerate în intestinul subțire.</div>
+                    <div class="correction-area"></div>
+                </div>
+
+                <div class="question-block" id="fb7">
+                    <div class="question-text">
+                        <span class="q-num">7.</span> Inima pompează sângele prin 
+                        <input type="text" class="fill-input" name="fb7a" placeholder="vas sânge..."> și 
+                        <input type="text" class="fill-input" name="fb7b" placeholder="vas sânge..."> pentru a asigura circulația.
+                    </div>
+                    <div class="correction-area"></div>
+                </div>
+
+                <div class="question-block" id="fb8">
+                    <div class="question-text"><span class="q-num">8.</span> Fecundația are loc, de obicei, la nivelul <input type="text" class="fill-input" name="fb8" placeholder="locație...">.</div>
+                    <div class="correction-area"></div>
+                </div>
+            </div>
+
+            <div class="quiz-section">
+                <div class="section-header">
+                    <h2 class="section-title">Corespondență</h2>
+                </div>
+
+                <div class="match-row" id="m1">
+                    <span class="match-organ">A. Creier</span>
+                    <select class="match-select" name="m1">
+                        <option value="0">Selectează funcția...</option>
+                        <option value="1">1. Controlează gândirea, memoria și mișcările</option>
+                        <option value="2">2. Schimb oxigen și dioxid de carbon</option>
+                        <option value="3">3. Pompează sângele</option>
+                        <option value="4">4. Absorbția nutrienților</option>
+                        <option value="5">5. Produc enzime digestive și hormoni</option>
+                        <option value="6">6. Protejează organele și produce celule sanguine</option>
+                    </select>
+                </div>
+                <div id="err-m1" class="correction-area"></div>
+
+                <div class="match-row" id="m2">
+                    <span class="match-organ">B. Plămâni</span>
+                    <select class="match-select" name="m2">
+                        <option value="0">Selectează funcția...</option>
+                        <option value="1">1. Controlează gândirea, memoria și mișcările</option>
+                        <option value="2">2. Schimb oxigen și dioxid de carbon</option>
+                        <option value="3">3. Pompează sângele</option>
+                        <option value="4">4. Absorbția nutrienților</option>
+                        <option value="5">5. Produc enzime digestive și hormoni</option>
+                        <option value="6">6. Protejează organele și produce celule sanguine</option>
+                    </select>
+                </div>
+                <div id="err-m2" class="correction-area"></div>
+
+                <div class="match-row" id="m3">
+                    <span class="match-organ">C. Inimă</span>
+                    <select class="match-select" name="m3">
+                        <option value="0">Selectează funcția...</option>
+                        <option value="1">1. Controlează gândirea, memoria și mișcările</option>
+                        <option value="2">2. Schimb oxigen și dioxid de carbon</option>
+                        <option value="3">3. Pompează sângele</option>
+                        <option value="4">4. Absorbția nutrienților</option>
+                        <option value="5">5. Produc enzime digestive și hormoni</option>
+                        <option value="6">6. Protejează organele și produce celule sanguine</option>
+                    </select>
+                </div>
+                <div id="err-m3" class="correction-area"></div>
+
+                <div class="match-row" id="m4">
+                    <span class="match-organ">D. Intestin</span>
+                    <select class="match-select" name="m4">
+                        <option value="0">Selectează funcția...</option>
+                        <option value="1">1. Controlează gândirea, memoria și mișcările</option>
+                        <option value="2">2. Schimb oxigen și dioxid de carbon</option>
+                        <option value="3">3. Pompează sângele</option>
+                        <option value="4">4. Absorbția nutrienților</option>
+                        <option value="5">5. Produc enzime digestive și hormoni</option>
+                        <option value="6">6. Protejează organele și produce celule sanguine</option>
+                    </select>
+                </div>
+                <div id="err-m4" class="correction-area"></div>
+
+                <div class="match-row" id="m5">
+                    <span class="match-organ">E. Pancreas</span>
+                    <select class="match-select" name="m5">
+                        <option value="0">Selectează funcția...</option>
+                        <option value="1">1. Controlează gândirea, memoria și mișcările</option>
+                        <option value="2">2. Schimb oxigen și dioxid de carbon</option>
+                        <option value="3">3. Pompează sângele</option>
+                        <option value="4">4. Absorbția nutrienților</option>
+                        <option value="5">5. Produc enzime digestive și hormoni</option>
+                        <option value="6">6. Protejează organele și produce celule sanguine</option>
+                    </select>
+                </div>
+                <div id="err-m5" class="correction-area"></div>
+
+                <div class="match-row" id="m6">
+                    <span class="match-organ">F. Schelet</span>
+                    <select class="match-select" name="m6">
+                        <option value="0">Selectează funcția...</option>
+                        <option value="1">1. Controlează gândirea, memoria și mișcările</option>
+                        <option value="2">2. Schimb oxigen și dioxid de carbon</option>
+                        <option value="3">3. Pompează sângele</option>
+                        <option value="4">4. Absorbția nutrienților</option>
+                        <option value="5">5. Produc enzime digestive și hormoni</option>
+                        <option value="6">6. Protejează organele și produce celule sanguine</option>
+                    </select>
+                </div>
+                <div id="err-m6" class="correction-area"></div>
+            </div>
+
+            <div class="action-bar">
+                <button type="button" class="btn-check" onclick="checkAnswers()" id="checkBtn">Finalizează Testul</button>
+            </div>
+
+        </form>
+    </main>
+
+    <div id="resultOverlay" class="result-overlay">
+        <div class="result-score" id="resultScore">0%</div>
+        <div class="result-text" id="resultMsg"></div>
+        <button class="btn-check" onclick="closeResults()">Vezi Greșelile</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const nav = document.getElementById('mainNav');
+            const activeLink = document.querySelector('.nav-active');
+            if (nav && activeLink) {
+                const scrollLeft = activeLink.offsetLeft - (nav.offsetWidth / 2) + (activeLink.offsetWidth / 2);
+                nav.scrollTo({ left: scrollLeft, behavior: 'auto' });
+            }
+            updateProgress();
+        });
+
+        const inputs = document.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            input.addEventListener('change', updateProgress);
+            input.addEventListener('input', updateProgress);
+        });
+
+        function updateProgress() {
+            const totalQ = 30; 
+            let filled = 0;
+            const radioGroups = new Set();
+            document.querySelectorAll('input[type="radio"]:checked').forEach(r => radioGroups.add(r.name));
+            filled += radioGroups.size;
+            document.querySelectorAll('input[type="text"]').forEach(i => { if(i.value.trim().length > 1) filled++; });
+            document.querySelectorAll('select').forEach(s => { if(s.value !== "0") filled++; });
+            const percent = Math.min(100, (filled / totalQ) * 100);
+            document.getElementById('progBar').style.width = percent + '%';
+        }
+
+        function smartNormalize(text) {
+            return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+        }
+
+        function checkAnswers() {
+            let score = 0;
+            const totalQuestions = 30;
+
+            document.querySelectorAll('.correction-box').forEach(e => e.remove());
+            document.querySelectorAll('input, select').forEach(el => el.style.borderColor = '');
+            document.querySelectorAll('input:checked').forEach(el => el.closest('.option-label').style.background = '');
+
+            const addFeedback = (container, isCorrect, correctText) => {
+                const div = document.createElement('div');
+                div.className = 'correction-box';
+                
+                if (isCorrect) {
+                    div.innerHTML = `<span class="status-dot" style="background:var(--accent-success)"></span> <span class="correct-msg">Corect</span>`;
+                } else {
+                    div.innerHTML = `<span class="status-dot" style="background:var(--accent-error)"></span> <span class="wrong-msg">Greșit. Corect: <b>${correctText}</b></span>`;
+                }
+                
+                const area = container.querySelector('.correction-area') || document.querySelector(`#err-${container.id.replace('m', 'm')}`);
+                if(area) area.appendChild(div);
+                else container.appendChild(div);
+            };
+
+            const mcAnswers = { q1: 'B', q2: 'B', q3: 'A', q4: 'A', q5: 'C', q6: 'B' };
+            for (let q in mcAnswers) {
+                const selected = document.querySelector(`input[name="${q}"]:checked`);
+                const block = document.getElementById(q);
+                if (selected && selected.value === mcAnswers[q]) {
+                    score++;
+                    addFeedback(block, true);
+                    selected.closest('.option-label').style.background = 'var(--accent-success)';
+                    selected.closest('.option-label').style.borderColor = 'var(--accent-success)';
+                } else if (selected) {
+                    addFeedback(block, false, mcAnswers[q]);
+                    selected.closest('.option-label').style.background = 'var(--accent-error)';
+                    selected.closest('.option-label').style.borderColor = 'var(--accent-error)';
+                } else {
+                    addFeedback(block, false, mcAnswers[q]);
+                }
+            }
+
+            const tfAnswers = { tf1: 'true', tf2: 'true', tf3: 'false', tf4: 'true', tf5: 'true', tf6: 'true', tf7: 'false' };
+            for (let q in tfAnswers) {
+                const selected = document.querySelector(`input[name="${q}"]:checked`);
+                const block = document.getElementById(q);
+                if (selected && selected.value === tfAnswers[q]) {
+                    score++;
+                    addFeedback(block, true);
+                    selected.closest('.option-label').style.background = 'var(--accent-success)';
+                } else if (selected) {
+                    const corrTxt = tfAnswers[q] === 'true' ? 'Adevărat' : 'Fals';
+                    addFeedback(block, false, corrTxt);
+                    selected.closest('.option-label').style.background = 'var(--accent-error)';
+                } else {
+                    addFeedback(block, false, tfAnswers[q] === 'true' ? 'Adevărat' : 'Fals');
+                }
+            }
+
+            const checkFill = (id, validArr, correctText) => {
+                const input = document.querySelector(`input[name="${id}"]`);
+                const block = input.closest('.question-block');
+                const val = smartNormalize(input.value);
+                const isOk = validArr.some(v => val === smartNormalize(v));
+                
+                if (isOk) {
+                    input.style.borderBottomColor = "var(--accent-success)";
+                    input.style.color = "var(--accent-success)";
+                    return true;
+                } else {
+                    input.style.borderBottomColor = "var(--accent-error)";
+                    input.style.color = "var(--accent-error)";
+                    addFeedback(block, false, correctText);
+                    return false;
+                }
+            };
+            
+            if(checkFill('fb1a', ['gandire', 'gandirea'], 'Gândire')) score++;
+            if(checkFill('fb1b', ['limbaj', 'limbajul', 'vorbire'], 'Limbaj')) score++;
+            if(checkFill('fb1c', ['perceptie', 'perceptia', 'simturi', 'simturile'], 'Percepție')) score++;
+            
+            if(checkFill('fb2', ['epididim', 'epididimul'], 'Epididim')) score++;
+            if(checkFill('fb3', ['300', '500', '300-500'], '300-500')) score++;
+            if(checkFill('fb4', ['insulina'], 'Insulină')) score++;
+            if(checkFill('fb5', ['lung', 'cel mai lung', 'puternic', 'mare'], 'Lung / Puternic')) score++;
+            if(checkFill('fb6', ['chim', 'chimul'], 'Chim gastric')) score++;
+            if(checkFill('fb7a', ['artere', 'arterele'], 'Artere')) score++;
+            if(checkFill('fb7b', ['vene', 'venele'], 'Vene')) score++;
+            if(checkFill('fb8', ['trompe', 'trompele', 'trompe uterine'], 'Trompe uterine')) score++;
+
+            const matchAnswers = { m1: '1', m2: '2', m3: '3', m4: '4', m5: '5', m6: '6' };
+            for (let q in matchAnswers) {
+                const select = document.querySelector(`select[name="${q}"]`);
+                const errArea = document.getElementById('err-' + q);
+                errArea.innerHTML = ''; 
+
+                if (select.value === matchAnswers[q]) {
+                    score++;
+                    select.style.borderColor = "var(--accent-success)";
+                } else {
+                    select.style.borderColor = "var(--accent-error)";
+                    const div = document.createElement('div');
+                    div.className = 'correction-box';
+                    div.innerHTML = `<span class="status-dot" style="background:var(--accent-error)"></span> <span class="wrong-msg">Greșit. Corect: <b>Opțiunea ${matchAnswers[q]}</b></span>`;
+                    errArea.appendChild(div);
+                }
+            }
+
+            const pct = Math.round((score / totalQuestions) * 100);
+            document.getElementById('resultScore').innerText = pct + "%";
+            
+            let msg = "";
+            if (pct === 100) { msg = "Perfect! Ești expert."; confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } }); }
+            else if (pct > 80) msg = "Foarte bine!";
+            else if (pct > 50) msg = "Destul de bine.";
+            else msg = "Mai încearcă.";
+            
+            document.getElementById('resultMsg').innerText = msg;
+            document.getElementById('resultOverlay').style.display = 'flex';
+        }
+
+        function closeResults() {
+            document.getElementById('resultOverlay').style.display = 'none';
+            const wrong = document.querySelector('.wrong-msg');
+            if(wrong) wrong.closest('.question-block, .match-row').scrollIntoView({behavior: 'smooth', block: 'center'});
+        }
+    </script>
+</body>
+</html>

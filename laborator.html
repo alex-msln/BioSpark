@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BioSpark | Laborator Interactiv</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-body: #ffffff;
+            --bg-subtle: #f8fafc;     
+            --text-main: #0f172a;     
+            --text-secondary: #334155;
+            --text-muted: #64748b;    
+            
+            --accent-color: #0891b2;  
+            --accent-hover: #0e7490;
+            --accent-soft: #ecfeff;
+            
+            --success-color: #10b981;
+            --success-soft: #d1fae5;
+            --error-color: #ef4444;
+
+            --border-color: #e2e8f0;
+            --radius-tech: 8px;      
+            
+            --font-stack: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-stack);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Header --- */
+        header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 5vw; 
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .brand {
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        nav {
+            max-width: 100%; 
+            overflow-x: auto; 
+            touch-action: pan-x;
+            scrollbar-width: none; 
+            white-space: nowrap; 
+        }
+        nav::-webkit-scrollbar { display: none; }
+
+        nav ul {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            padding: 5px 0; margin: 0;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #9ca3af; 
+            font-size: 0.85rem;
+            font-weight: 500; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        nav a:hover, nav a.nav-active { color: var(--text-main); }
+        nav a::after {
+            content: ''; position: absolute; width: 0; height: 2px;
+            bottom: -4px; left: 0; background-color: var(--text-main);
+            transition: width 0.3s;
+        }
+        nav a:hover::after, nav a.nav-active::after { width: 100%; }
+
+        /* --- Layout Principal --- */
+        main {
+            padding: 40px 5vw;
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .page-intro {
+            text-align: center;
+            margin-bottom: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .page-intro h1 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 800;
+            margin-bottom: 0;
+            color: var(--text-main);
+        }
+
+        .intro-text {
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0;
+            line-height: 1.6;
+            font-size: 1.05rem;
+            text-wrap: balance; 
+        }
+
+        .intro-text strong {
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        /* --- Game Area --- */
+        .game-wrapper {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        /* --- Zona Minerale (Sursa) --- */
+        .minerals-panel {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-tech);
+            padding: 20px;
+            position: sticky;
+            top: 100px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .panel-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: block;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .minerals-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .mineral-drag {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-color);
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: grab;
+            user-select: none;
+            transition: all 0.2s ease;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mineral-drag:hover {
+            border-color: var(--accent-color);
+            background: var(--accent-soft);
+            color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .mineral-drag:active { cursor: grabbing; }
+
+        .mineral-drag.selected {
+            background: var(--text-main);
+            color: #fff;
+            border-color: var(--text-main);
+            box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.2);
+        }
+
+        .mineral-symbol {
+            font-family: monospace;
+            background: rgba(0,0,0,0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8em;
+        }
+
+        .mineral-drag.matched {
+            opacity: 0.5;
+            pointer-events: none;
+            text-decoration: line-through;
+            background: var(--bg-subtle);
+            border-color: transparent;
+        }
+
+        /* --- Zona Organe (Target) --- */
+        .organs-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .organ-card {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-tech);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .organ-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            transform: translateY(-3px);
+        }
+
+        .organ-image-area {
+            width: 100%;
+            aspect-ratio: 4/3; 
+            background: var(--bg-subtle);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .organ-img {
+            max-width: 80%;
+            max-height: 80%;
+            object-fit: contain;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .drop-zone-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+            cursor: pointer;
+        }
+        
+        body.dragging .drop-zone-overlay {
+            opacity: 1;
+            background: rgba(236, 254, 255, 0.6);
+            border: 2px dashed var(--accent-color);
+        }
+        
+        .drop-zone-text {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--accent-color);
+            pointer-events: none;
+        }
+
+        .organ-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .organ-name {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .match-slot {
+            height: 40px;
+            background: var(--bg-subtle);
+            border: 1px dashed #cbd5e1;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .organ-card.solved {
+            border-color: var(--success-color);
+            background: #fff;
+        }
+
+        .organ-card.solved .match-slot {
+            background: var(--success-color);
+            border-style: solid;
+            border-color: var(--success-color);
+            color: white;
+            font-weight: 700;
+        }
+
+        .info-text {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            display: none; 
+            animation: slideDown 0.4s ease forwards;
+        }
+
+        .organ-card.solved .info-text {
+            display: block;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+            20%, 40%, 60%, 80% { transform: translateX(4px); }
+        }
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; border-color: var(--error-color); }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media screen and (max-width: 1024px) {
+            .game-wrapper {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .minerals-panel {
+                position: relative;
+                top: 0;
+                max-height: none;
+                overflow-x: auto;
+                white-space: nowrap;
+                padding: 15px;
+                
+                /* AICI S-A FĂCUT MODIFICAREA PENTRU SCROLLBAR ASCUNS */
+                -ms-overflow-style: none;  /* IE and Edge */
+                scrollbar-width: none;  /* Firefox */
+            }
+
+            /* Chrome, Safari, Opera */
+            .minerals-panel::-webkit-scrollbar {
+                display: none;
+            }
+
+            .minerals-grid {
+                flex-wrap: nowrap;
+                gap: 12px;
+                padding-bottom: 5px;
+            }
+
+            .mineral-drag {
+                width: auto;
+                min-width: 140px;
+            }
+        }
+
+        @media screen and (max-width: 700px) {
+            header {
+                flex-direction: column;   
+                align-items: center;      
+                gap: 15px;               
+                padding-bottom: 15px;
+            }
+            nav { width: 100%; }
+            nav ul { justify-content: space-between; padding: 0 10px; }
+            
+            .organs-container {
+                grid-template-columns: 1fr; 
+            }
+
+            .page-intro h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand" onclick="window.location.href='index.html'">BioSpark</div>
+        <nav id="mainNav">
+            <ul>
+                <li><a href="index.html">Atlas</a></li>
+                <li><a href="enciclopedie.html">Enciclopedie</a></li>
+                <li><a href="quizz.html">Quizz</a></li>
+                <li><a href="laborator.html" class="nav-active">Laborator</a></li>
+                <li><a href="simptome.html">Simptome</a></li>
+                <li><a href="sanatate.html">Sănătate</a></li>
+                <li><a href="curiozitati.html">Curiozități</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="page-intro">
+            <h1>Biochimie Interactivă</h1>
+            <p class="intro-text">
+                Asociază corect elementele chimice cu organele corespunzătoare pentru a descoperi rolul lor vital. <br>
+                <strong>Instrucțiuni:</strong> Trage mineralul sau selectează-l și apoi apasă pe organul țintă.
+            </p>
+        </div>
+
+        <div class="game-wrapper">
+            
+            <aside class="minerals-panel">
+                <span class="panel-title">Elemente Chimice</span>
+                <div class="minerals-grid" id="mineralsList">
+                    </div>
+            </aside>
+
+            <div class="organs-container" id="organsGrid">
+                </div>
+
+        </div>
+    </main>
+
+    <script>
+        const gameData = [
+            {
+                id: "brain",
+                name: "Creier",
+                mineral: "Fosfor",
+                symbol: "P",
+                info: "Intră în componența fosfolipidelor din membrane și a moleculelor energetice (ATP), susținând funcționarea neuronilor.",
+                img: "creier.png" 
+            },
+            {
+                id: "thyroid",
+                name: "Tiroidă",
+                mineral: "Iod",
+                symbol: "I",
+                info: "Esențial pentru hormonii tiroidieni (T3/T4), care controlează metabolismul, temperatura corpului și dezvoltarea.",
+                img: "tiroida.jpg"
+            },
+            {
+                id: "bone",
+                name: "Sistem Osos",
+                mineral: "Calciu",
+                symbol: "Ca",
+                info: "Principalul mineral al oaselor și dinților; ajută și la contracția musculară și coagularea sângelui.",
+                img: "schelet.jpg"
+            },
+            {
+                id: "lungs",
+                name: "Plămâni",
+                mineral: "Magneziu",
+                symbol: "Mg",
+                info: "Contribuie la relaxarea musculaturii netede (inclusiv bronșii) și la funcționarea enzimelor respiratorii.",
+                img: "plamani.png"
+            },
+            {
+                id: "heart",
+                name: "Inimă",
+                mineral: "Potasiu",
+                symbol: "K",
+                info: "Cheie pentru impulsurile electrice cardiace; menține ritmul inimii împreună cu sodiul și calciul.",
+                img: "inima.jpg"
+            },
+            {
+                id: "stomach",
+                name: "Stomac",
+                mineral: "Clor",
+                symbol: "Cl",
+                info: "Sub formă de clorură participă la formarea acidului clorhidric (HCl), necesar digestiei și distrugerii microbilor.",
+                img: "stomac.jpg"
+            },
+            {
+                id: "liver",
+                name: "Ficat",
+                mineral: "Fier",
+                symbol: "Fe",
+                info: "Implicat în metabolism și sinteza enzimelor; ficatul depozitează fier și îl gestionează pentru nevoi.",
+                img: "ficat.jpg"
+            },
+            {
+                id: "intestine",
+                name: "Intestine",
+                mineral: "Zinc",
+                symbol: "Zn",
+                info: "Sprijină regenerarea mucoasei intestinale, imunitatea locală și activitatea enzimelor digestive.",
+                img: "intestin-subtire.jpg"
+            },
+            {
+                id: "gallbladder",
+                name: "Vezica Biliară",
+                mineral: "Sulf",
+                symbol: "S",
+                info: "Reacțiile de detoxifiere hepatică depind de compuși cu sulf (ex. glutation), ajutați de eliminarea biliară.",
+                img: "ficat.jpg" 
+            },
+            {
+                id: "repro_f",
+                name: "Reprod. Feminin",
+                mineral: "Seleniu",
+                symbol: "Se",
+                info: "Antioxidant important; susține funcția ovariană și calitatea ovocitelor prin protecția de stres oxidativ.",
+                img: "repro-f.jpg"
+            },
+            {
+                id: "repro_m",
+                name: "Reprod. Masculin",
+                mineral: "Cupru",
+                symbol: "Cu",
+                info: "Participă la metabolismul energetic și influențează mobilitatea și integritatea spermatozoizilor.",
+                img: "repro-m.jpg"
+            }
+        ];
+
+        const mineralsContainer = document.getElementById('mineralsList');
+        const organsContainer = document.getElementById('organsGrid');
+        let selectedMineral = null; 
+
+        function initGame() {
+            gameData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'organ-card';
+                card.dataset.targetMineral = item.symbol; 
+                card.id = `card-${item.id}`;
+
+                const imgSrc = item.img ? item.img : ''; 
+                
+                card.innerHTML = `
+                    <div class="organ-image-area" onclick="handleOrganClick(this)">
+                        <img src="${imgSrc}" alt="${item.name}" class="organ-img" onerror="this.style.display='none'; this.parentElement.innerText='${item.name} Image'">
+                        <div class="drop-zone-overlay">
+                            <span class="drop-zone-text">Plasează Aici</span>
+                        </div>
+                    </div>
+                    <div class="organ-content">
+                        <div class="organ-name">${item.name}</div>
+                        <div class="match-slot" id="slot-${item.id}">Trage elementul</div>
+                        <div class="info-text">${item.info}</div>
+                    </div>
+                `;
+
+                card.addEventListener('dragover', (e) => {
+                    e.preventDefault(); 
+                    card.querySelector('.drop-zone-overlay').style.opacity = '1';
+                });
+                
+                card.addEventListener('dragleave', () => {
+                    card.querySelector('.drop-zone-overlay').style.opacity = '';
+                });
+
+                card.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    card.querySelector('.drop-zone-overlay').style.opacity = '';
+                    const mineralSymbol = e.dataTransfer.getData('text/plain');
+                    validateMatch(card, mineralSymbol);
+                });
+
+                organsContainer.appendChild(card);
+            });
+
+            const shuffledMinerals = [...gameData].sort(() => Math.random() - 0.5);
+
+            shuffledMinerals.forEach(item => {
+                const dragItem = document.createElement('div');
+                dragItem.className = 'mineral-drag';
+                dragItem.draggable = true;
+                dragItem.dataset.symbol = item.symbol;
+                dragItem.id = `drag-${item.symbol}`;
+                dragItem.innerHTML = `${item.mineral} <span class="mineral-symbol">${item.symbol}</span>`;
+
+                dragItem.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', item.symbol);
+                    document.body.classList.add('dragging');
+                    if(selectedMineral) deselectMineral(); 
+                });
+
+                dragItem.addEventListener('dragend', () => {
+                    document.body.classList.remove('dragging');
+                });
+
+                dragItem.addEventListener('click', () => {
+                    if (dragItem.classList.contains('matched')) return;
+                    
+                    if (selectedMineral === dragItem) {
+                        deselectMineral();
+                    } else {
+                        if (selectedMineral) deselectMineral();
+                        selectMineral(dragItem);
+                    }
+                });
+
+                mineralsContainer.appendChild(dragItem);
+            });
+        }
+
+        function selectMineral(element) {
+            selectedMineral = element;
+            element.classList.add('selected');
+            document.body.classList.add('dragging'); 
+        }
+
+        function deselectMineral() {
+            if (selectedMineral) {
+                selectedMineral.classList.remove('selected');
+                selectedMineral = null;
+            }
+            document.body.classList.remove('dragging');
+        }
+
+        window.handleOrganClick = function(imageAreaElement) {
+            if (!selectedMineral) return; 
+            
+            const card = imageAreaElement.closest('.organ-card');
+            if (card.classList.contains('solved')) return; 
+
+            const symbol = selectedMineral.dataset.symbol;
+            validateMatch(card, symbol);
+        }
+
+        function validateMatch(card, symbol) {
+            const targetSymbol = card.dataset.targetMineral;
+            
+            if (symbol === targetSymbol) {
+                handleSuccess(card, symbol);
+            } else {
+                handleError(card);
+            }
+        }
+
+        function handleSuccess(card, symbol) {
+            card.classList.add('solved');
+            
+            const dataItem = gameData.find(i => i.symbol === symbol);
+            const slot = card.querySelector('.match-slot');
+            slot.innerHTML = `${dataItem.mineral} (${symbol}) <span style="margin-left:5px">✓</span>`;
+
+            const dragItem = document.getElementById(`drag-${symbol}`);
+            if (dragItem) {
+                dragItem.classList.add('matched');
+                dragItem.draggable = false;
+            }
+
+            deselectMineral();
+            checkWinCondition();
+        }
+
+        function handleError(card) {
+            card.classList.remove('shake');
+            void card.offsetWidth; 
+            card.classList.add('shake');
+            
+            const slot = card.querySelector('.match-slot');
+            const originalText = slot.innerText;
+            slot.innerText = "Incorect!";
+            slot.style.color = "var(--error-color)";
+            slot.style.borderColor = "var(--error-color)";
+
+            setTimeout(() => {
+                slot.innerText = originalText;
+                slot.style.color = "";
+                slot.style.borderColor = "";
+            }, 1000);
+        }
+
+        function checkWinCondition() {
+            const total = gameData.length;
+            const solved = document.querySelectorAll('.organ-card.solved').length;
+
+            if (total === solved) {
+                setTimeout(() => {
+                    alert("Felicitări! Ai completat tot atlasul biochimic!");
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 500);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initGame();
+
+            const nav = document.getElementById('mainNav');
+            const activeLink = document.querySelector('.nav-active');
+
+            if (nav && activeLink) {
+                const scrollLeft = activeLink.offsetLeft - (nav.offsetWidth / 2) + (activeLink.offsetWidth / 2);
+                nav.scrollTo({
+                    left: scrollLeft,
+                    behavior: 'auto' 
+                });
+            }
+        });
+    </script>
+</body>
+</html>

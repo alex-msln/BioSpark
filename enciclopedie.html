@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BioSpark | Enciclopedie</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+   <style>
+        :root {
+            --bg-body: #ffffff;
+            --bg-subtle: #f8fafc;     
+            --text-main: #0f172a;     
+            --text-secondary: #334155;
+            --text-muted: #64748b;    
+            
+            --accent-color: #0891b2;  
+            --accent-hover: #0e7490;
+            --accent-soft: #ecfeff;
+            
+            --border-color: #e2e8f0;
+            
+            --radius-tech: 6px;      
+            --radius-btn: 4px;
+            
+            --font-stack: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { 
+            scroll-behavior: smooth; 
+            scroll-padding-top: 100px; 
+        }
+
+        body {
+            font-family: var(--font-stack);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 5vw; 
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .brand {
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        nav {
+            max-width: 100%; 
+            overflow-x: auto; 
+            overflow-y: hidden;
+            touch-action: pan-x;
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+            white-space: nowrap; 
+        }
+        nav::-webkit-scrollbar { display: none; }
+
+        nav ul {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            padding: 5px 0; margin: 0;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #9ca3af; 
+            font-size: 0.85rem;
+            font-weight: 500; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        nav a:hover, nav a.nav-active { color: var(--text-main); }
+        nav a::after {
+            content: ''; position: absolute; width: 0; height: 2px;
+            bottom: -4px; left: 0; background-color: var(--text-main);
+            transition: width 0.3s;
+        }
+        nav a:hover::after, nav a.nav-active::after { width: 100%; }
+
+        .layout-container {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 60px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 50px 5vw;
+            padding-bottom: 30vh;
+            width: 100%;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 100px;
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+            padding-right: 15px;
+            border-right: 1px solid transparent; 
+        }
+
+        .sidebar-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-muted);
+            font-weight: 800;
+            margin-bottom: 15px;
+            padding-left: 10px;
+            display: block;
+        }
+
+        .toc-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .toc-link {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.15s ease;
+            font-weight: 500;
+            border-radius: var(--radius-btn);
+            border-left: 3px solid transparent;
+        }
+
+        .toc-link:hover {
+            color: var(--text-main);
+            background-color: var(--bg-subtle);
+        }
+
+        .toc-link.active {
+            background-color: var(--accent-soft); 
+            color: var(--accent-color);
+            font-weight: 700;
+            border-left-color: var(--accent-color);
+        }
+        
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            gap: 90px;
+        }
+
+        .organ-section { scroll-margin-top: 110px; }
+
+        .organ-header { margin-bottom: 30px; }
+
+        .header-meta {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .subtitle {
+            font-size: 0.7rem;
+            color: var(--accent-color);
+            background: var(--accent-soft);
+            padding: 3px 8px;
+            border-radius: var(--radius-btn);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 1px solid rgba(8, 145, 178, 0.1);
+        }
+
+        .header-text h2 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.03em;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .biometrics-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .bio-card {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-tech);
+            padding: 10px 16px;
+            min-width: 110px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bio-label { 
+            font-size: 0.6rem; 
+            color: var(--text-muted); 
+            text-transform: uppercase; 
+            font-weight: 700; 
+            margin-bottom: 4px;
+            letter-spacing: 0.05em;
+        }
+        .bio-value { 
+            font-size: 0.95rem; 
+            color: var(--text-main); 
+            font-weight: 700; 
+            font-family: monospace;
+        }
+
+        .organ-body {
+            display: grid;
+            grid-template-columns: 1fr 400px; 
+            gap: 50px;
+            align-items: start;
+        }
+
+        .text-content p {
+            line-height: 1.7;
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            text-align: justify;
+        }
+
+        .text-content h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin: 35px 0 15px 0;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+            display: inline-block;
+        }
+        
+        .text-content ul {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .text-content li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            font-size: 1rem;
+        }
+
+        .text-content li::before {
+            content: ''; 
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 6px;
+            height: 6px;
+            background-color: var(--accent-color);
+            border-radius: 2px;
+        }
+        
+        .text-content li strong {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .visual-container {
+            background: #fff;
+            padding: 6px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-tech);
+            
+            position: sticky;
+            top: 130px; 
+            height: fit-content;
+            z-index: 10;
+        }
+
+        .organ-img {
+            width: 100%;      
+            height: auto;     
+            display: block;
+            max-height: 70vh;  
+            object-fit: contain; 
+            border-radius: 4px;
+            background: var(--bg-subtle); 
+        }
+
+        .img-caption {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        @media screen and (max-width: 1200px) {
+             .organ-body { grid-template-columns: 1fr 350px; gap: 40px; }
+        }
+
+        @media screen and (max-width: 1024px) {
+            .layout-container { grid-template-columns: 200px 1fr; gap: 40px; }
+            .organ-body { grid-template-columns: 1fr; }
+            
+            .visual-container { 
+                order: -1; 
+                margin-bottom: 25px; 
+                max-width: 100%; 
+                position: relative; 
+                top: 0;
+            }
+            .organ-img { max-height: 500px; } 
+        }
+
+        @media screen and (max-width: 800px) {
+            header {
+                flex-direction: column;   
+                align-items: center;      
+                gap: 15px;               
+                padding-bottom: 15px;
+            }
+            
+            nav { width: 100%; }
+            
+            nav ul {
+                gap: 20px;
+                padding: 0 10px;
+                justify-content: space-between;
+            }
+
+            .layout-container { display: block; padding: 30px 5vw; padding-bottom: 25vh; }
+            
+            .sidebar::-webkit-scrollbar {
+                display: none; 
+            }
+
+            .sidebar { 
+                position: sticky; 
+                top: 73px; 
+                height: auto; 
+                margin-bottom: 40px; 
+                background: rgba(255,255,255,0.98);
+                border-bottom: 1px solid var(--border-color);
+                z-index: 900;
+                padding: 10px 0;
+                width: 100vw;
+                margin-left: -5vw;
+                padding-left: 5vw;
+                
+                overflow-x: auto; 
+                white-space: nowrap;
+                border-right: none;
+                
+                scrollbar-width: none; 
+                -ms-overflow-style: none;
+            }
+
+            .toc-list {
+                flex-direction: row;
+                gap: 10px;
+                padding-right: 20px;
+            }
+
+            .toc-link {
+                background: #fff;
+                border: 1px solid var(--border-color);
+                border-left: 1px solid var(--border-color);
+                padding: 6px 14px;
+                font-size: 0.85rem;
+            }
+            
+            .toc-link.active {
+                background: var(--text-main); 
+                color: #fff;
+                border-color: var(--text-main);
+                border-left-color: var(--text-main);
+            }
+
+            .header-text h2 { font-size: 2rem; }
+            .biometrics-container { gap: 10px; }
+            .bio-card { flex: 1 0 45%; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand" onclick="window.location.href='index.html'">BioSpark</div>
+        <nav id="mainNav">
+            <ul>
+                <li><a href="index.html">Atlas</a></li>
+                <li><a href="enciclopedie.html" class="nav-active">Enciclopedie</a></li>
+                <li><a href="quizz.html">Quizz</a></li>
+                <li><a href="laborator.html">Laborator</a></li>
+                <li><a href="simptome.html">Simptome</a></li>
+                <li><a href="sanatate.html">Sănătate</a></li>
+                <li><a href="curiozitati.html">Curiozități</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="layout-container">
+        
+        <aside class="sidebar">
+            <span class="sidebar-title">Index Anatomic</span>
+            <ul class="toc-list">
+                <li><a href="#creier" class="toc-link">Creierul Uman</a></li>
+                <li><a href="#inima" class="toc-link">Inima</a></li>
+                <li><a href="#plamani" class="toc-link">Plămâni</a></li>
+                <li><a href="#stomac" class="toc-link">Stomac</a></li>
+                <li><a href="#intestin-subtire" class="toc-link">Intestin Subțire</a></li>
+                <li><a href="#intestin-gros" class="toc-link">Intestin Gros</a></li>
+                <li><a href="#pancreas" class="toc-link">Pancreas</a></li>
+                <li><a href="#ficat" class="toc-link">Ficat</a></li>
+                <li><a href="#rinichi" class="toc-link">Rinichi</a></li>
+                <li><a href="#tiroida" class="toc-link">Glanda Tiroidă</a></li>
+                <li><a href="#schelet" class="toc-link">Sistemul Osos</a></li>
+                <li><a href="#vezica" class="toc-link">Vezica Urinară</a></li>
+                <li><a href="#repro-m" class="toc-link">Sist. Reprod. (M)</a></li>
+                <li><a href="#repro-f" class="toc-link">Sist. Reprod. (F)</a></li>
+            </ul>
+        </aside>
+
+        <div class="content-area">
+
+            <section id="creier" class="organ-section">
+                <div class="organ-header">
+                    <div class="header-meta"><span class="subtitle">Sistem Nervos Central</span></div>
+                    <div class="header-text"><h2>Creierul Uman</h2></div>
+                    <div class="biometrics-container">
+                        <div class="bio-card"><span class="bio-label">Greutate</span><span class="bio-value">1.4 kg</span></div>
+                        <div class="bio-card"><span class="bio-label">Neuroni</span><span class="bio-value">~86 mld</span></div>
+                        <div class="bio-card"><span class="bio-label">Compoziție</span><span class="bio-value">75% Apă</span></div>
+                    </div>
+                </div>
+                <div class="organ-body">
+                    <div class="text-content">
+                        <p>Creierul uman este organul central al sistemului nervos și sediul conștiinței. Deși reprezintă doar 2% din greutatea corpului, consumă 20% din energia acestuia.</p>
+                        <h3>Anatomie & Structură</h3>
+                        <ul>
+                            <li><strong>Emisferele Cerebrale:</strong> Responsabile pentru procesarea informațiilor complexe.</li>
+                            <li><strong>Lobul Frontal:</strong> Sediul personalității, al deciziei și al mișcării voluntare.</li>
+                            <li><strong>Sistemul Limbic:</strong> Gestionează emoțiile primare și memoria.</li>
+                        </ul>
+                    </div>
+                    <div class="visual-container">
+                        <img src="creier.png" alt="Creierul Uman" class="organ-img">
+                        <div class="img-caption">Fig 1. Structura cerebrală</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="inima" class="organ-section">
+                <div class="organ-header">
+                    <div class="header-meta"><span class="subtitle">Sistem Cardiovascular</span></div>
+                    <div class="header-text"><h2>Inima</h2></div>
+                    <div class="biometrics-container">
+                        <div class="bio-card"><span class="bio-label">Greutate</span><span class="bio-value">300 g</span></div>
+                        <div class="bio-card"><span class="bio-label">Debit</span><span class="bio-value">5 L/min</span></div>
+                    </div>
+                </div>
+                <div class="organ-body">
+                    <div class="text-content">
+                        <p>Motorul central al sistemului circulator, inima este un mușchi cavitar care pompează sângele ritmic.</p>
+                        <h3>Structură</h3>
+                        <ul>
+                            <li><strong>Cavități:</strong> 4 camere (2 Atrii și 2 Ventricule).</li>
+                            <li><strong>Septul:</strong> Peretele care separă strict partea stângă de cea dreaptă.</li>
+                        </ul>
+                    </div>
+                    <div class="visual-container">
+                        <img src="inima.jpg" alt="Inima" class="organ-img">
+                        <div class="img-caption">Fig 2. Anatomie cardiacă</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="plamani" class="organ-section">
+                <div class="organ-header">
+                    <div class="header-meta"><span class="subtitle">Sistem Respirator</span></div>
+                    <div class="header-text"><h2>Plămânii</h2></div>
+                    <div class="biometrics-container">
+                        <div class="bio-card"><span class="bio-label">Alveole</span><span class="bio-value">500 mil</span></div>
+                        <div class="bio-card"><span class="bio-label">Suprafață</span><span class="bio-value">~70 mp</span></div>
+                    </div>
+                </div>
+                <div class="organ-body">
+                    <div class="text-content">
+                        <p>Organele principale ale respirației, unde are loc schimbul de gaze între aerul atmosferic și sânge.</p>
+                        <h3>Arborele Bronșic</h3>
+                        <p>Aerul circulă prin trahee și bronhii până la alveole. Plămânul drept are 3 lobi, iar cel stâng are 2 lobi.</p>
+                    </div>
+                    <div class="visual-container">
+                        <img src="plamani.png" alt="Plamanii" class="organ-img">
+                         <div class="img-caption">Fig 3. Arborele respirator</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="stomac" class="organ-section">
+                <div class="organ-header">
+                    <div class="header-meta"><span class="subtitle">Sistem Digestiv</span></div>
+                    <div class="header-text"><h2>Stomacul</h2></div>
+                    <div class="biometrics-container">
+                        <div class="bio-card"><span class="bio-label">Volum Max</span><span class="bio-value">4 Litri</span></div>
+                        <div class="bio-card"><span class="bio-label">pH Acid</span><span class="bio-value">1.5 - 3</span></div>
+                    </div>
+                </div>
+                <div class="organ-body">
+                    <div class="text-content">
+                        <p>Rezervor digestiv în formă de "J". Realizează digestia mecanică și chimică.</p>
+                        <h3>Mecanism Chimic</h3>
+                        <p>Secretă acid clorhidric (HCl) și enzime pentru a descompune proteinele. Mucoasa se regenerează constant.</p>
+                    </div>
+                    <div class="visual-container">
+                        <img src="stomac.jpg" alt="Stomac" class="organ-img">
+                         <div class="img-caption">Fig 4. Anatomia gastrică</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="intestin-subtire" class="organ-section">
+                <div class="organ-header">
+                    <div class="header-meta"><span class="subtitle">Sistem Digestiv</span></div>
+                    <div class="header-text"><h2>Intestin Subțire</h2></div>
+                    <div class="biometrics-container">
+                        <div class="bio-card"><span class="bio-label">Lungime</span><span class="bio-value">6 metri</span></div>
+                        <div class="bio-card"><span class="bio-label">Absorbție</span><span class="bio-value">90%</span></div>
+                    </div>
+                </div>
+                <div class="organ-body">
+                    <div class="text-content">
+                        <p>Segmentul unde are loc finalizarea digestiei și absorbția nutrienților.</p>
+                        <ul>
+                            <li><strong>Duoden:</strong> Primește bila și enzimele pancreatice.</li>
+                            <li><strong>Jejun & Ileon:</strong> Suprafața internă are vilozități pentru absorbție maximă.</li>
+                        </ul>
+                    </div>
+                    <div class="visual-container">
+                        <img src="intestin-subtire.jpg" alt="Intestin Subtire" class="organ-img">
+                        <div class="img-caption">Fig 5. Vilozități intestinale</div>
+                    </div>
+                </div>
+            </section>
+
+             <section id="intestin-gros" class="organ-section">
+                <div class="organ-header">
+                    <div class="header-meta"><span class="subtitle">Sistem Digestiv</span></div>
+                    <div class="header-text"><h2>Intestin Gros</h2></div>
+                    <div class="biometrics-container">
+                        <div class="bio-card"><span class="bio-label">Lungime</span><span class="bio-value">1.5 m</span></div>
+                        <div class="bio-card"><span class="bio-label">Funcție</span><span class="bio-value">H2O</span></div>
+                    </div>
+                </div>
+                <div class="organ-body">
+                    <div class="text-content">
+                        <p>Ultimul segment digestiv. Transformă resturile în materii solide.</p>
+                        <h3>Rolul Microbiomului</h3>
+                        <p>Absoarbe apa și vitaminele produse de bacteriile simbiotice. Nu are vilozități.</p>
+                    </div>
+                    <div class="visual-container">
+                        <img src="intestin-gros.jpg" alt="Intestin Gros" class="organ-img">
+                        <div class="img-caption">Fig 6. Colonul</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="pancreas" class="organ-section">
+                <div class="organ-header">
+                    <div class="header-meta"><span class="subtitle">Glandă Mixtă</span></div>
+                    <div class="header-text"><h2>Pancreasul</h2></div>
+                    <div class="biometrics-container">
+                        <div class="bio-card"><span class="bio-label">Tip</span><span class="bio-value">Endo/Exocrin</span></div>
+                    </div>
+                </div>
+                <div class="organ-body">
+                    <div class="text-content">
+                        <p>Glandă vitală cu rol dublu: digestie și reglarea zahărului.</p>
+                        <ul>
+                            <li><strong>Exocrin:</strong> Produce enzime pentru digestie.</li>
+                            <li><strong>Endocrin:</strong> Produce insulină și glucagon.</li>
+                        </ul>
+                    </div>
+                    <div class="visual-container">
+                        <img src="pancreas.jpg" alt="Pancreas" class="organ-img">
+                         <div class="img-caption">Fig 7. Pancreasul</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="ficat" class="organ-section">
+                <div class="organ-header">
+                    <div class="header-meta"><span class="subtitle">Glandă Anexă</span></div>
+                    <div class="header-text"><h2>Ficatul</h2></div>
+                    <div class="biometrics-container">
+                        <div class="bio-card"><span class="bio-label">Greutate</span><span class="bio-value">1.5 kg</span></div>
+                        <div class="bio-card"><span class="bio-label">Rol</span><span class="bio-value">Detoxifiere</span></div>
+                    </div>
+                </div>
+                <div class="organ-body">
+                    <div class="text-content">
+                        <p>Cea mai mare glandă internă, "laboratorul chimic" al corpului.</p>
+                        <h3>Funcții Cheie</h3>
+                        <p>Filtrează toxinele, stochează energie și produce bila necesară digestiei grăsimilor.</p>
+                    </div>
+                    <div class="visual-container">
+                        <img src="ficat.jpg" alt="Ficat" class="organ-img">
+                         <div class="img-caption">Fig 8. Lobii hepatici</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="rinichi" class="organ-section">
+                <div class="organ-header">
+                    <div class="header-meta"><span class="subtitle">Sistem Excretor</span></div>
+                    <div class="header-text"><h2>Rinichii</h2></div>
+                    <div class="biometrics-container">
+                        <div class="bio-card"><span class="bio-label">Unitate</span><span class="bio-value">Nefron</span></div>
+                    </div>
+                </div>
+                <div class="organ-body">
+                    <div class="text-content">
+                        <p>Organe pereche responsabile pentru filtrarea sângelui și eliminarea deșeurilor prin urină.</p>
+                        <h3>Funcționare</h3>
+                        <p>Sângele trece prin milioane de unități de filtrare numite nefroni. Substanțele utile sunt recuperate.</p>
+                    </div>
+                    <div class="visual-container">
+                        <img src="rinichi.jpg" alt="Rinichi" class="organ-img">
+                         <div class="img-caption">Fig 9. Secțiune renală</div>
+                    </div>
+                </div>
+            </section>
+
+             <section id="tiroida" class="organ-section">
+                <div class="organ-header">
+                    <div class="header-meta"><span class="subtitle">Sistem Endocrin</span></div>
+                    <div class="header-text"><h2>Glanda Tiroidă</h2></div>
+                    <div class="biometrics-container">
+                        <div class="bio-card"><span class="bio-label">Hormoni</span><span class="bio-value">T3, T4</span></div>
+                    </div>
+                </div>
+                <div class="organ-body">
+                    <div class="text-content">
+                        <p>Glandă în formă de fluture care controlează metabolismul.</p>
+                        <h3>Mecanism</h3>
+                        <p>Folosește iodul pentru a produce hormoni care reglează ritmul cardiac și temperatura corpului.</p>
+                    </div>
+                    <div class="visual-container">
+                        <img src="tiroida.jpg" alt="Tiroida" class="organ-img">
+                         <div class="img-caption">Fig 10. Localizare cervicală</div>
+                    </div>
+                </div>
+            </section>
+
+             <section id="schelet" class="organ-section">
+                <div class="organ-header">
+                    <div class="header-meta"><span class="subtitle">Sistem Osos</span></div>
+                    <div class="header-text"><h2>Sistemul Osos</h2></div>
+                    <div class="biometrics-container">
+                        <div class="bio-card"><span class="bio-label">Total Oase</span><span class="bio-value">206</span></div>
+                        <div class="bio-card"><span class="bio-label">Cel mai lung</span><span class="bio-value">Femur</span></div>
+                    </div>
+                </div>
+                <div class="organ-body">
+                    <div class="text-content">
+                        <p>Structura rigidă care susține corpul și protejează organele interne.</p>
+                        <ul>
+                            <li><strong>Măduva Osoasă:</strong> Produce celulele sângelui.</li>
+                            <li><strong>Depozit:</strong> Oasele stochează calciul organismului.</li>
+                        </ul>
+                    </div>
+                    <div class="visual-container">
+                        <img src="schelet.jpg" alt="Schelet" class="organ-img">
+                        <div class="img-caption">Fig 11. Scheletul uman</div>
+                    </div>
+                </div>
+            </section>
+
+             <section id="vezica" class="organ-section">
+                <div class="organ-header">
+                    <div class="header-meta"><span class="subtitle">Sistem Excretor</span></div>
+                    <div class="header-text"><h2>Vezica Urinară</h2></div>
+                    <div class="biometrics-container">
+                        <div class="bio-card"><span class="bio-label">Capacitate</span><span class="bio-value">500 ml</span></div>
+                    </div>
+                </div>
+                <div class="organ-body">
+                    <div class="text-content">
+                        <p>Organ elastic care colectează urina produsă de rinichi.</p>
+                        <h3>Control</h3>
+                        <p>Senzorii de presiune semnalează când e plină. Eliminarea e controlată voluntar.</p>
+                    </div>
+                    <div class="visual-container">
+                        <img src="vezica.jpg" alt="Vezica" class="organ-img">
+                         <div class="img-caption">Fig 12. Sistem urinar</div>
+                    </div>
+                </div>
+            </section>
+
+             <section id="repro-m" class="organ-section">
+                <div class="organ-header">
+                    <div class="header-meta"><span class="subtitle">Sistem Reproductiv</span></div>
+                    <div class="header-text"><h2>Sistem Masculin</h2></div>
+                </div>
+                <div class="organ-body">
+                    <div class="text-content">
+                        <p>Responsabil pentru producerea și livrarea materialului genetic masculin.</p>
+                        <ul>
+                            <li><strong>Testicule:</strong> Produc spermatozoizi și testosteron.</li>
+                            <li><strong>Prostata:</strong> Secretă lichid seminal.</li>
+                        </ul>
+                    </div>
+                    <div class="visual-container">
+                        <img src="repro-m.jpg" alt="Reproductiv Masculin" class="organ-img">
+                        <div class="img-caption">Fig 13. Anatomie masculină</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="repro-f" class="organ-section">
+                <div class="organ-header">
+                    <div class="header-meta"><span class="subtitle">Sistem Reproductiv</span></div>
+                    <div class="header-text"><h2>Sistem Feminin</h2></div>
+                </div>
+                <div class="organ-body">
+                    <div class="text-content">
+                        <p>Sistem complex pentru producerea ovulelor și susținerea sarcinii.</p>
+                        <ul>
+                            <li><strong>Ovare:</strong> Eliberează ovule și hormoni.</li>
+                            <li><strong>Uter:</strong> Organ muscular unde se dezvoltă fătul.</li>
+                        </ul>
+                    </div>
+                    <div class="visual-container">
+                        <img src="repro-f.jpg" alt="Reproductiv Feminin" class="organ-img">
+                        <div class="img-caption">Fig 14. Anatomie feminină</div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.toc-link');
+            const sections = document.querySelectorAll('section');
+            const nav = document.getElementById('mainNav');
+
+            function checkBottomScroll() {
+                const isAtBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10;
+
+                if (isAtBottom) {
+                    navLinks.forEach(link => link.classList.remove('active'));
+                    const lastLink = navLinks[navLinks.length - 1];
+                    if (lastLink) {
+                        lastLink.classList.add('active');
+                        syncNavScroll(lastLink);
+                    }
+                    return true;
+                }
+                return false;
+            }
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '-40% 0px -60% 0px', 
+                threshold: 0
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50) return;
+
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navLinks.forEach(link => link.classList.remove('active'));
+                        const activeLink = document.querySelector(`.toc-link[href="#${id}"]`);
+                        
+                        if (activeLink) {
+                            activeLink.classList.add('active');
+                            syncNavScroll(activeLink);
+                        }
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            window.addEventListener('scroll', checkBottomScroll, { passive: true });
+
+            function syncNavScroll(activeLink) {
+                const sidebar = document.querySelector('.sidebar');
+                if (window.innerWidth <= 800 && sidebar) {
+                    const scrollLeft = activeLink.offsetLeft - (sidebar.offsetWidth / 2) + (activeLink.offsetWidth / 2);
+                    sidebar.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+                }
+            }
+
+            const activeHeaderLink = document.querySelector('.nav-active');
+            if (nav && activeHeaderLink) {
+                const scrollLeft = activeHeaderLink.offsetLeft - (nav.offsetWidth / 2) + (activeHeaderLink.offsetWidth / 2);
+                nav.scrollTo({ left: scrollLeft, behavior: 'auto' });
+            }
+        });
+    </script>
+</body>
+</html>

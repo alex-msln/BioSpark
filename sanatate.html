@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BioSpark | Sănătate & Nutriție</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-body: #ffffff;       
+            --bg-row-hover: #f8fafc;  
+            --text-main: #0f172a;     
+            --text-secondary: #334155;
+            --text-muted: #94a3b8;    
+            --accent-color: #0e7490;  
+            --accent-soft: #e0f2fe;   
+            --border-color: #e2e8f0;  
+            --font-stack: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-stack);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 5vw; 
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .brand {
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        nav {
+            max-width: 100%; 
+            overflow-x: auto; 
+            overflow-y: hidden; 
+            touch-action: pan-x; 
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+            white-space: nowrap; 
+        }
+        nav::-webkit-scrollbar { display: none; }
+
+        nav ul {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            padding: 5px 0; margin: 0;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #9ca3af; 
+            font-size: 0.85rem;
+            font-weight: 500; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        nav a:hover, nav a.nav-active { color: var(--text-main); }
+        nav a::after {
+            content: ''; position: absolute; width: 0; height: 2px;
+            bottom: -4px; left: 0; background-color: var(--text-main);
+            transition: width 0.3s;
+        }
+        nav a:hover::after, nav a.nav-active::after { width: 100%; }
+
+        main {
+            padding: 80px 5vw;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-intro {
+            margin-bottom: 60px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid var(--text-main);
+        }
+
+        .page-intro h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 10px;
+            color: var(--text-main);
+        }
+
+        .page-intro p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 700px;
+        }
+
+        .medical-table {
+            display: flex;
+            flex-direction: column;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .medical-row {
+            display: grid;
+            grid-template-columns: 250px 1fr 1fr 1fr; 
+            gap: 30px;
+            padding: 35px 20px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s ease;
+        }
+
+        .medical-row:hover { background-color: var(--bg-row-hover); }
+
+        .row-identity {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .system-tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-color);
+            font-weight: 700;
+        }
+
+        .organ-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+        }
+
+        .nutrient-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-left: 0; 
+            border-left: none; 
+        }
+
+        .nutrient-header {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 8px; height: 8px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .nutrient-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .nutrient-source {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-top: auto;
+            padding-top: 5px;
+        }
+
+        .source-label {
+            color: var(--text-muted);
+            font-weight: 400;
+            font-style: italic;
+            margin-right: 4px;
+        }
+
+        @media screen and (max-width: 1100px) {
+            .medical-row { grid-template-columns: 200px 1fr; gap: 20px; }
+            .row-identity { grid-row: span 3; }
+            
+            .nutrient-cell { 
+                border-left: none; 
+                border-bottom: 1px dashed var(--border-color); 
+                padding-left: 0; 
+                padding-bottom: 15px; 
+            }
+            .nutrient-cell:last-child { border-bottom: none; }
+        }
+
+        @media screen and (max-width: 700px) {
+            header { 
+                flex-direction: column; 
+                align-items: center; 
+                gap: 15px; 
+                padding-bottom: 15px; 
+            }
+            
+            nav { width: 100%; }
+            nav ul { 
+                gap: 20px; 
+                padding: 0 10px;
+                justify-content: space-between;
+            }
+
+            .page-intro h1 { font-size: 2rem; }
+            
+            .medical-row { 
+                display: flex; 
+                flex-direction: column; 
+                gap: 20px; 
+                padding: 30px 15px; 
+            }
+            
+            .row-identity { border-bottom: 2px solid var(--accent-soft); padding-bottom: 10px; margin-bottom: 5px; }
+            .nutrient-cell { padding: 10px; background-color: #f9fafb; border: 1px solid #f3f4f6; border-radius: 6px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand" onclick="window.location.href='index.html'">BioSpark</div>
+        <nav id="mainNav">
+            <ul>
+                <li><a href="index.html">Atlas</a></li>
+                <li><a href="enciclopedie.html">Enciclopedie</a></li>
+                <li><a href="quizz.html">Quizz</a></li>
+                <li><a href="laborator.html">Laborator</a></li>
+                <li><a href="simptome.html">Simptome</a></li>
+                <li><a href="sanatate.html" class="nav-active">Sănătate</a></li>
+                <li><a href="curiozitati.html">Curiozități</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="page-intro">
+            <h1>Sănătate & Nutriție</h1>
+            <p>Ghid complet al micronutrienților esențiali pentru funcționarea optimă a organelor și sistemelor corpului uman.</p>
+        </div>
+
+        <div class="medical-table">
+
+            <div class="medical-row">
+                <div class="row-identity">
+                    <span class="system-tag">Sistem Nervos</span>
+                    <span class="organ-name">Creier</span>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Vitamina B12</div>
+                    <div class="nutrient-desc">Susține funcția cognitivă și formarea mielinei.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Carne, ouă, lactate</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Vitamina B6</div>
+                    <div class="nutrient-desc">Formarea neurotransmițătorilor (serotonină, dopamină).</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Pește, carne, cartofi</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Omega-3 (DHA)</div>
+                    <div class="nutrient-desc">Esențial pentru dezvoltarea și funcționarea neuronilor.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Pește gras, nuci, in</div>
+                </div>
+            </div>
+
+            <div class="medical-row">
+                <div class="row-identity">
+                    <span class="system-tag">Endocrin</span>
+                    <span class="organ-name">Glanda Tiroidă</span>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Iod</div>
+                    <div class="nutrient-desc">Element esențial pentru producerea hormonilor T3 și T4.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Sare iodată, pește, fructe de mare</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Seleniu</div>
+                    <div class="nutrient-desc">Ajută la transformarea T4 în T3 și protejează tiroida.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Nuci braziliene, pește, ouă</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Zinc</div>
+                    <div class="nutrient-desc">Contribuie la reglarea secreției hormonilor.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Carne, semințe dovleac</div>
+                </div>
+            </div>
+
+            <div class="medical-row">
+                <div class="row-identity">
+                    <span class="system-tag">Cardiovascular</span>
+                    <span class="organ-name">Inimă</span>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Magneziu</div>
+                    <div class="nutrient-desc">Menține ritmul cardiac și contracția mușchilor.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Nuci, semințe, legume verzi</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Potasiu</div>
+                    <div class="nutrient-desc">Reglează tensiunea arterială.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Banane, cartofi, legume</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Omega-3</div>
+                    <div class="nutrient-desc">Reduce inflamația și colesterolul.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Pește gras, in, nuci</div>
+                </div>
+            </div>
+
+            <div class="medical-row">
+                <div class="row-identity">
+                    <span class="system-tag">Digestiv</span>
+                    <span class="organ-name">Stomac</span>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Vitamina B1</div>
+                    <div class="nutrient-desc">Ajută digestia carbohidraților.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Cereale integrale, semințe</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Vitamina C</div>
+                    <div class="nutrient-desc">Protejează mucoasa gastrică.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Citrice, ardei, kiwi</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Zinc</div>
+                    <div class="nutrient-desc">Susține digestia enzimatică și vindecarea mucoasei.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Carne, nuci, semințe</div>
+                </div>
+            </div>
+
+            <div class="medical-row">
+                <div class="row-identity">
+                    <span class="system-tag">Digestiv</span>
+                    <span class="organ-name">Intestin Subțire</span>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Vitamina B9 (Folic)</div>
+                    <div class="nutrient-desc">Repararea și creșterea celulelor.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Legume verzi, linte</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Vitamina B12</div>
+                    <div class="nutrient-desc">Producția de celule sangvine.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Carne, pește, lactate</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Magneziu</div>
+                    <div class="nutrient-desc">Ajută absorbția nutrienților.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Nuci, legume verzi</div>
+                </div>
+            </div>
+
+            <div class="medical-row">
+                <div class="row-identity">
+                    <span class="system-tag">Digestiv</span>
+                    <span class="organ-name">Intestin Gros</span>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Vitamina K</div>
+                    <div class="nutrient-desc">Sănătatea sistemului osos și coagularea sângelui.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Varză, spanac, broccoli</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Biotina (B7)</div>
+                    <div class="nutrient-desc">Metabolismul nutrienților.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Ouă, nuci, cereale</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Fibre</div>
+                    <div class="nutrient-desc">Hrănesc microbiota intestinală.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Fructe, legume, cereale</div>
+                </div>
+            </div>
+
+            <div class="medical-row">
+                <div class="row-identity">
+                    <span class="system-tag">Endocrin/Digestiv</span>
+                    <span class="organ-name">Pancreas</span>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Vitamina D</div>
+                    <div class="nutrient-desc">Reglarea secreției de insulină.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Somon, ouă, soare</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Zinc</div>
+                    <div class="nutrient-desc">Activitate enzimatică și secreția insulinei.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Carne, semințe, nuci</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Magneziu</div>
+                    <div class="nutrient-desc">Susține funcția insulinică.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Nuci, legume verzi</div>
+                </div>
+            </div>
+
+            <div class="medical-row">
+                <div class="row-identity">
+                    <span class="system-tag">Scheletic</span>
+                    <span class="organ-name">Sistem Osos</span>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Calciu</div>
+                    <div class="nutrient-desc">Rezistența și structura oaselor.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Lactate, broccoli</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Vitamina D</div>
+                    <div class="nutrient-desc">Absorbția calciului.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Somon, soare</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Vitamina K</div>
+                    <div class="nutrient-desc">Mineralizarea osoasă.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Varză, spanac</div>
+                </div>
+            </div>
+
+            <div class="medical-row">
+                <div class="row-identity">
+                    <span class="system-tag">Metabolic</span>
+                    <span class="organ-name">Ficat</span>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Vitamina B12</div>
+                    <div class="nutrient-desc">Ajută la detoxifiere și formarea celulelor.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Ficat, carne, ouă</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Vitamina A</div>
+                    <div class="nutrient-desc">Susține funcția hepatică și regenerarea.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Morcovi, spanac, ficat</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Vitamina E</div>
+                    <div class="nutrient-desc">Protejează ficatul de stresul oxidativ.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Nuci, uleiuri vegetale</div>
+                </div>
+            </div>
+
+            <div class="medical-row">
+                <div class="row-identity">
+                    <span class="system-tag">Excretor</span>
+                    <span class="organ-name">Vezica Urinară</span>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Vitamina C</div>
+                    <div class="nutrient-desc">Acidifică urina și previne infecțiile.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Citrice, kiwi, ardei</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Vitamina A</div>
+                    <div class="nutrient-desc">Menține sănătatea mucoasei urinare.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Morcovi, ficat</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Zinc</div>
+                    <div class="nutrient-desc">Ajută sistemul imunitar și vindecarea.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Semințe dovleac, carne</div>
+                </div>
+            </div>
+
+            <div class="medical-row">
+                <div class="row-identity">
+                    <span class="system-tag">Reproductiv</span>
+                    <span class="organ-name">Sist. Masculin</span>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Zinc</div>
+                    <div class="nutrient-desc">Esențial pentru testosteron și spermă.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Carne roșie, semințe</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Vitamina E</div>
+                    <div class="nutrient-desc">Îmbunătățește fertilitatea.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Migdale, uleiuri, avocado</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Vitamina D</div>
+                    <div class="nutrient-desc">Susține nivelul hormonilor masculini.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Pește gras, ouă</div>
+                </div>
+            </div>
+
+             <div class="medical-row">
+                <div class="row-identity">
+                    <span class="system-tag">Reproductiv</span>
+                    <span class="organ-name">Sist. Feminin</span>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Fier</div>
+                    <div class="nutrient-desc">Previne anemia, important la menstruație.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Carne roșie, spanac, linte</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Acid Folic (B9)</div>
+                    <div class="nutrient-desc">Esențial pentru ovulație și sarcină.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Legume verzi, citrice</div>
+                </div>
+                <div class="nutrient-cell">
+                    <div class="nutrient-header"><span class="dot"></span>Vitamina D</div>
+                    <div class="nutrient-desc">Reglează ciclul și sănătatea hormonală.</div>
+                    <div class="nutrient-source"><span class="source-label">Surse:</span> Pește, ouă, soare</div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const nav = document.getElementById('mainNav');
+            const activeLink = document.querySelector('.nav-active');
+
+            if (nav && activeLink) {
+                const scrollLeft = activeLink.offsetLeft - (nav.offsetWidth / 2) + (activeLink.offsetWidth / 2);
+                
+                nav.scrollTo({
+                    left: scrollLeft,
+                    behavior: 'auto' 
+                });
+            }
+        });
+    </script>
+</body>
+</html>

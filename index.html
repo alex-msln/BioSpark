@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BioSpark | Atlas Interactiv</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-body: #f8f9fa;       
+            --bg-card: #ffffff;       
+            --text-main: #1f2937;     
+            --text-muted: #9ca3af;    
+            --accent-color: #111827;  
+            --font-stack: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-stack);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            height: 100vh;
+            height: 100dvh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        header {
+            width: 100%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 5vw; 
+            background: var(--bg-card);
+            border-bottom: 1px solid rgba(0,0,0,0.05); 
+            z-index: 1000;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .brand {
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+            text-transform: uppercase;
+        }
+
+        nav {
+            max-width: 100%; 
+            overflow-x: auto;
+            overflow-y: hidden; 
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+            touch-action: pan-x; 
+            -webkit-overflow-scrolling: touch;
+            white-space: nowrap; 
+        }
+        
+        nav::-webkit-scrollbar { display: none; }
+
+        nav ul {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            padding: 5px 0; 
+            margin: 0;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+            position: relative;
+            display: inline-block; 
+        }
+
+        nav a:hover {
+            color: var(--text-main);
+        }
+        
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--accent-color);
+            transition: width 0.3s;
+        }
+        
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        nav a.nav-active {
+            color: var(--text-main); 
+            font-weight: 500;        
+            cursor: default;
+        }
+
+        main {
+            flex-grow: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            position: relative;
+            overflow: hidden;
+            background: var(--bg-card); 
+        }
+
+        .controls {
+            flex-shrink: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 0; 
+            padding: 25px 0;
+            background: var(--bg-card);
+            z-index: 100;
+        }
+
+        .switch-btn {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid #e5e7eb;
+            font-family: var(--font-stack);
+            font-size: 0.8rem;
+            font-weight: 500; 
+            color: var(--text-muted);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 10px 25px;
+            transition: all 0.3s ease;
+        }
+
+        .switch-btn:hover {
+            color: var(--text-main);
+        }
+
+        .switch-btn.active {
+            color: var(--text-main);
+            border-bottom: 2px solid var(--text-main);
+            font-weight: 700; 
+        }
+
+        .anatomy-stage {
+            flex: 1;
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+            padding: 0;
+            -webkit-overflow-scrolling: touch;
+        }
+
+       .anatomy-wrapper {
+            position: relative;
+            height: 100%;
+            width: auto;
+            margin: 0 auto;
+            padding: 0 10px;
+            box-sizing: content-box;
+        }
+
+        @media (min-width: 768px) {
+            .anatomy-wrapper { padding: 0 20px; }
+        }
+
+        .anatomy-img {
+            display: block;
+            height: 100%;
+            width: auto;
+            max-height: 100%;
+            max-width: none;
+            opacity: 0;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            -webkit-user-drag: none;
+            image-rendering: -webkit-optimize-contrast; 
+        }
+
+        .anatomy-img.visible {
+            opacity: 1;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .anatomy-img:not(.visible) {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 100%;
+            width: auto;
+            z-index: 1;
+        }
+
+        .organ-label {
+            position: absolute;
+            z-index: 300;
+            background: transparent;
+            border: none;
+            font-family: var(--font-stack);
+            font-size: clamp(15px, 3vh, 24px); 
+            font-weight: 600; 
+            color: #1f2937; 
+            text-shadow: 
+                -1px -1px 0 #fff,  
+                 1px -1px 0 #fff,
+                -1px  1px 0 #fff,
+                 1px  1px 0 #fff;
+            cursor: pointer;
+            text-transform: capitalize;
+            white-space: nowrap;
+            transform: translate(-50%, -50%);
+            margin: 0;
+            opacity: 1;
+            transition: transform 0.2s ease, opacity 0.3s ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            padding: 5px 10px;
+        }
+
+        .organ-label.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .organ-label:hover {
+            color: #000;
+            transform: translate(-50%, -50%) scale(1.05);
+            z-index: 301;
+        }
+        
+        @media screen and (max-width: 700px) {
+            header {
+                flex-direction: column;
+                align-items: center; 
+                gap: 15px;
+                padding-bottom: 15px;
+            }
+            
+            nav {
+                width: 100%; 
+            }
+
+            nav ul {
+                gap: 20px;
+                padding: 0 10px;
+                justify-content: space-between;
+                width: auto; 
+                min-width: auto; 
+            }
+        }
+
+        #org-testicule { left: 14.1%; top: 88.4%; }
+        #org-prostata { left: 85.6%; top: 82.1%; }
+        #org-intestine { left: 85.8%; top: 69.7%; }
+        #org-rinichi { left: 19.1%; top: 66.4%; }
+        #org-ficat { left: 21.4%; top: 51.8%; }
+        #org-pancreas { left: 86.1%; top: 56.9%; }
+        #org-stomac { left: 84.6%; top: 51.2%; }
+        #org-plamani { left: 85.2%; top: 43.0%; }
+        #org-inima { left: 83.0%; top: 36.9%; }
+        #org-creier { left: 77.8%; top: 7.9%; }
+        #org-vezica { left: 89.4%; top: 76.8%; }
+        #org-tiroida { left: 86.0%; top: 25.8%; }
+        #org-biliara { left: 15.5%; top: 56.6%; }
+        #org-ovare { left: 88.4%; top: 82.0%;  display: none;}
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">BioSpark</div>
+        <nav>
+            <ul>
+                <li><a href="index.html" class="nav-active">Atlas</a></li>
+                <li><a href="enciclopedie.html">Enciclopedie</a></li>
+                <li><a href="quizz.html">Quizz</a></li>
+                <li><a href="laborator.html">Laborator</a></li>
+                <li><a href="simptome.html">Simptome</a></li>
+                <li><a href="sanatate.html">Sănătate</a></li>
+                <li><a href="curiozitati.html">Curiozități</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="controls">
+            <button class="switch-btn active" onclick="switchImg('male')" id="btn-male">Masculin</button>
+            <button class="switch-btn" onclick="switchImg('female')" id="btn-female">Feminin</button>
+        </div>
+
+        <div class="anatomy-stage">
+            <div class="anatomy-wrapper" id="main-wrapper">
+                
+                <img src="barbat.png" alt="Anatomie Masculin" class="anatomy-img visible" id="img-male">
+                <img src="femeie.png" alt="Anatomie Feminin" class="anatomy-img" id="img-female">
+
+                <button class="organ-label" id="org-creier" onclick="nav('creier')">Creier</button>
+                <button class="organ-label" id="org-tiroida" onclick="nav('tiroida')">Glandă tiroidă</button>
+                <button class="organ-label" id="org-inima" onclick="nav('inima')">Inimă</button>
+                <button class="organ-label" id="org-plamani" onclick="nav('plamani')">Plămâni</button>
+                <button class="organ-label" id="org-ficat" onclick="nav('ficat')">Ficat</button>
+                <button class="organ-label" id="org-stomac" onclick="nav('stomac')">Stomac</button>
+                <button class="organ-label" id="org-biliara" onclick="nav('biliara')">Vezică biliară</button>
+                <button class="organ-label" id="org-pancreas" onclick="nav('pancreas')">Pancreas</button>
+                <button class="organ-label" id="org-rinichi" onclick="nav('rinichi')">Rinichi</button>
+                <button class="organ-label" id="org-intestine" onclick="nav('intestine')">Intestine</button>
+                <button class="organ-label" id="org-vezica" onclick="nav('vezica')">Vezică urinară</button>
+                
+                <button class="organ-label fade-out" id="org-ovare" onclick="nav('ovare')">Ovare și Uter</button>
+                <button class="organ-label" id="org-prostata" onclick="nav('prostata')">Prostată</button>
+                <button class="organ-label" id="org-testicule" onclick="nav('testicule')">Testicule</button>
+            </div>
+        </div>
+
+    </main>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        const hartaNavigare = {
+            'ficat': [
+                'org-ficat', 'ficat',            
+                'org-vezica-biliara', 'vezica-biliara', 'org-biliara' 
+            ],
+
+            'intestin-subtire': [
+                'org-intestin-subtire', 'intestin-subtire', 
+                'org-intestine', 'intestine'     
+            ],
+
+            'intestin-gros': ['org-intestin-gros', 'intestin-gros', 'colon'],
+            'stomac':   ['org-stomac', 'stomac'],
+            'pancreas': ['org-pancreas', 'pancreas'],
+            'rinichi':  ['org-rinichi', 'rinichi'],
+            'vezica':   ['org-vezica', 'vezica', 'vezica-urinara'], 
+
+            'creier':   ['org-creier', 'creier'],
+            'tiroida':  ['org-tiroida', 'tiroida'],
+            'inima':    ['org-inima', 'inima'],
+            'plamani':  ['org-plamani', 'plamani'],
+            'schelet':  ['org-schelet', 'schelet', 'oase'],
+
+            'repro-m':  ['org-testicule', 'testicule', 'org-prostata', 'prostata'],
+            'repro-f':  ['org-ovare', 'ovare', 'org-uter', 'uter']
+        };
+
+        Object.keys(hartaNavigare).forEach(destinatie => {
+            const surse = hartaNavigare[destinatie];
+            
+            surse.forEach(idElement => {
+                const element = document.getElementById(idElement);
+                
+                if (element) {
+                    element.style.cursor = 'pointer';
+                    
+                    element.onclick = function(e) {
+                        e.preventDefault();
+                        e.stopPropagation(); 
+                        
+                        window.location.href = `enciclopedie.html#${destinatie}`;
+                    };
+                }
+            });
+        });
+    });
+</script>
+    <script>
+        function switchImg(type) {
+            const mImg = document.getElementById('img-male');
+            const fImg = document.getElementById('img-female');
+            const mBtn = document.getElementById('btn-male');
+            const fBtn = document.getElementById('btn-female');
+
+            const prostata = document.getElementById('org-prostata');
+            const testicule = document.getElementById('org-testicule');
+            const ovare = document.getElementById('org-ovare');
+
+            if(type === 'male') {
+                mImg.classList.add('visible');
+                fImg.classList.remove('visible');
+                mBtn.classList.add('active');
+                fBtn.classList.remove('active');
+
+                prostata.style.display = 'block';
+                testicule.style.display = 'block';
+                ovare.style.display = 'none'; 
+                
+                setTimeout(() => {
+                    prostata.classList.remove('fade-out');
+                    testicule.classList.remove('fade-out');
+                    ovare.classList.add('fade-out');
+                }, 10);
+
+            } else {
+                fImg.classList.add('visible');
+                mImg.classList.remove('visible');
+                fBtn.classList.add('active');
+                mBtn.classList.remove('active');
+
+                ovare.style.display = 'block'; 
+                prostata.style.display = 'none';
+                testicule.style.display = 'none';
+
+                setTimeout(() => {
+                    ovare.classList.remove('fade-out');
+                    prostata.classList.add('fade-out');
+                    testicule.classList.add('fade-out');
+                }, 10);
+            }
+        }
+
+        function nav(pagina) {
+            window.location.href = pagina + ".html";
+        }
+
+        function centerAnatomy() {
+            const stage = document.querySelector('.anatomy-stage');
+            if(stage) {
+                const centerPos = (stage.scrollWidth - stage.clientWidth) / 2;
+                stage.scrollLeft = centerPos;
+            }
+        }
+
+        window.addEventListener('load', () => {
+            centerAnatomy();
+            setTimeout(centerAnatomy, 100); 
+        });
+
+        window.addEventListener('resize', centerAnatomy);
+    </script>
+</body>
+</html>

@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BioSpark | Simptomatologie</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-body: #ffffff;       
+            --bg-row-hover: #f1f5f9;  
+            --text-main: #0f172a;     
+            --text-secondary: #334155;
+            --text-muted: #64748b;    
+            --accent-color: #0891b2;  
+            --accent-dark: #155e75;
+            --accent-soft: #ecfeff;   
+            --border-color: #e2e8f0;  
+            --highlight-color: #fef08a; 
+            --font-stack: 'Inter', system-ui, -apple-system, sans-serif;
+            
+            --tag-bg: #f8fafc;
+            --tag-text: #475569;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-stack);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 5vw; 
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .brand {
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        nav {
+            max-width: 100%; 
+            overflow-x: auto; 
+            overflow-y: hidden; 
+            touch-action: pan-x;
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+            white-space: nowrap; 
+        }
+        nav::-webkit-scrollbar { display: none; }
+
+        nav ul {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            padding: 5px 0; margin: 0;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #9ca3af; 
+            font-size: 0.85rem;
+            font-weight: 500; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        nav a:hover, nav a.nav-active { color: var(--text-main); }
+        nav a::after {
+            content: ''; position: absolute; width: 0; height: 2px;
+            bottom: -4px; left: 0; background-color: var(--text-main);
+            transition: width 0.3s;
+        }
+        nav a:hover::after, nav a.nav-active::after { width: 100%; }
+
+        main {
+            padding: 60px 5vw;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-intro {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-intro h1 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .page-intro p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            max-width: 650px;
+            line-height: 1.6;
+        }
+
+        .filter-section {
+            background: #fff;
+            padding: 0 0 30px 0;
+            margin-bottom: 20px;
+        }
+
+        .filter-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: block;
+            letter-spacing: 0.05em;
+        }
+
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 25px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .filter-chips::-webkit-scrollbar {
+            display: none;
+        }
+
+        .chip-btn {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            border-radius: 6px; 
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: var(--font-stack);
+            font-weight: 600;
+            white-space: nowrap; 
+        }
+
+        .chip-btn:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-dark);
+            background: var(--accent-soft);
+            transform: translateY(-1px);
+        }
+
+        .chip-btn.active {
+            background-color: var(--text-main);
+            color: #fff;
+            border-color: var(--text-main);
+        }
+
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 20px 14px 45px;
+            font-size: 0.95rem;
+            font-family: var(--font-stack);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: #fff;
+            transition: all 0.2s ease;
+            outline: none;
+            color: var(--text-main);
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .symptom-table {
+            display: flex;
+            flex-direction: column;
+            border-top: 2px solid var(--text-main); 
+        }
+
+        .symptom-row {
+            display: grid;
+            grid-template-columns: 200px 1.6fr 1.4fr 1fr; 
+            gap: 40px;
+            padding: 30px 20px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s ease;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+            align-items: start;
+        }
+
+        .symptom-row:hover { background-color: var(--bg-row-hover); }
+
+        .row-organ {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .organ-tag {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 700;
+            background: var(--tag-bg);
+            padding: 4px 8px;
+            border-radius: 4px;
+            align-self: flex-start;
+            border: 1px solid var(--border-color);
+        }
+
+        .organ-name {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.01em;
+            line-height: 1.3;
+        }
+
+        .data-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .cell-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 2px;
+            opacity: 0.8;
+            display: block; 
+        }
+
+        .symptom-text {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .cause-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .rec-cell {
+            position: relative;
+        }
+
+        .rec-text {
+            font-size: 0.85rem;
+            color: var(--accent-dark);
+            font-weight: 600;
+            line-height: 1.5;
+        }
+
+        .highlight {
+            background-color: var(--highlight-color);
+            color: var(--text-main);
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+
+        .no-results {
+            padding: 80px 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media screen and (max-width: 1024px) {
+            .symptom-row { 
+                grid-template-columns: 160px 1fr 1fr; 
+                gap: 25px;
+            }
+            .rec-cell { grid-column: span 1; }
+        }
+
+        @media screen and (max-width: 850px) {
+            .symptom-row {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 25px 20px;
+            }
+            
+            .row-organ {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                border-bottom: 1px solid var(--bg-row-hover);
+                padding-bottom: 10px;
+                margin-bottom: 5px;
+            }
+
+            .organ-tag { order: 2; margin-left: 10px; }
+            .organ-name { font-size: 1.3rem; }
+            
+            .rec-cell {
+                border-left: none;
+                background: var(--bg-row-hover);
+                padding: 15px;
+                border-radius: 8px;
+                margin-top: 5px;
+            }
+            
+            .row-organ .cell-label { display: none; }
+        }
+
+        @media screen and (max-width: 700px) {
+            header { 
+                flex-direction: column; 
+                align-items: center; 
+                gap: 15px; 
+                padding-bottom: 15px; 
+            }
+            
+            nav { width: 100%; }
+            nav ul { 
+                gap: 20px; 
+                padding: 0 10px;
+                justify-content: space-between;
+            }
+        }
+
+        @media screen and (max-width: 600px) {
+            main { padding: 40px 5vw; }
+            
+            .filter-chips { 
+                overflow-x: auto; 
+                flex-wrap: nowrap;
+                padding: 10px 5px 10px 5px;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand" onclick="window.location.href='index.html'">BioSpark</div>
+        <nav id="mainNav">
+            <ul>
+                <li><a href="index.html">Atlas</a></li>
+                <li><a href="enciclopedie.html">Enciclopedie</a></li>
+                <li><a href="quizz.html">Quizz</a></li>
+                <li><a href="laborator.html">Laborator</a></li>
+                <li><a href="simptome.html" class="nav-active">Simptome</a></li>
+                <li><a href="sanatate.html">Sănătate</a></li>
+                <li><a href="curiozitati.html">Curiozități</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="page-intro">
+            <h1>Diagnostic Diferențial</h1>
+            <p>Instrument pentru identificarea simptomatologiei. Selectează sistemul biologic sau utilizează căutarea semantică pentru filtrare.</p>
+        </div>
+
+        <div class="filter-section">
+            <span class="filter-label">Filtrare Sistematică</span>
+            <div class="filter-chips">
+                <button class="chip-btn active" onclick="filterBySystem('all', this)">Toate</button>
+                <button class="chip-btn" onclick="filterBySystem('nervos', this)">Neurologie</button>
+                <button class="chip-btn" onclick="filterBySystem('respirator', this)">Respirator</button>
+                <button class="chip-btn" onclick="filterBySystem('cardio', this)">Cardiovascular</button>
+                <button class="chip-btn" onclick="filterBySystem('digestiv', this)">Gastroenterologie</button>
+                <button class="chip-btn" onclick="filterBySystem('endocrin', this)">Endocrin</button>
+                <button class="chip-btn" onclick="filterBySystem('scheletic', this)">Osteo-Articular</button>
+                <button class="chip-btn" onclick="filterBySystem('excretor', this)">Renal & Excretor</button>
+                <button class="chip-btn" onclick="filterBySystem('repro', this)">Reproductiv</button>
+            </div>
+
+            <div class="search-wrapper">
+                <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" id="searchInput" class="search-input" placeholder="Caută simptom, organ sau patologie (ex: cefalee, icter)..." onkeyup="filterByText()">
+            </div>
+        </div>
+
+        <div class="symptom-table" id="symptomTable">
+            </div>
+        <div class="no-results" id="noResults">Nu s-au identificat corelații pentru termenii căutați.</div>
+    </main>
+
+    <script>
+        const symptomsData = [
+            {
+                organ: "Creier / SNC", tag: "Neurologie", systems: ["nervos"],
+                symptom: "Cefalee (dureri de cap) recurente, vertij, stări confuzionale.",
+                cause: "Hipertensiune arterială, migrene cronice, hipoxie, traumatisme craniene.",
+                rec: "Monitorizare TA, hidratare, consult Neurologie."
+            },
+            {
+                organ: "Sistem Cognitiv", tag: "Neuro-Psihic", systems: ["nervos"],
+                symptom: "Amnezie temporară, deficit de atenție, ceață mentală.",
+                cause: "Stres oxidativ, epuizare nervoasă, deficite vasculare cerebrale.",
+                rec: "Evaluare neurocognitivă, odihnă activă."
+            },
+            {
+                organ: "Cerebel / Motricitate", tag: "Motor", systems: ["nervos"],
+                symptom: "Ataxie (lipsa coordonării), instabilitate posturală.",
+                cause: "Accident vascular (AVC), patologie vestibulară sau cerebelară.",
+                rec: "RMN Cerebral, consult Neurologie urgent."
+            },
+            {
+                organ: "Plămâni", tag: "Pneumologie", systems: ["respirator"],
+                symptom: "Dispnee (lipsă de aer), tuse productivă/seacă, wheezing.",
+                cause: "Astm bronșic, BPOC, pneumonie interstițială sau bacteriană.",
+                rec: "Spirometrie, Radiografie pulmonară."
+            },
+            {
+                organ: "Inimă", tag: "Cardiologie", systems: ["cardio"],
+                symptom: "Angină pectorală (durere în piept), palpitații, astenie fizică.",
+                cause: "Ischemie cardiacă, aritmii, valvulopatii, insuficiență cardiacă.",
+                rec: "EKG de repaus/efort, consult Cardiolog."
+            },
+            {
+                organ: "Intestine", tag: "Gastro-Intestinal", systems: ["digestiv"],
+                symptom: "Meteorism (balonare), tranzit accelerat sau constipație cronică.",
+                cause: "Sindrom de colon iritabil (IBS), disbioză, intoleranțe alimentare.",
+                rec: "Regim FODMAP, probiotice, consult Gastro."
+            },
+            {
+                organ: "Stomac", tag: "Gastric", systems: ["digestiv"],
+                symptom: "Pirozis (arsuri), durere epigastrică, reflux acid.",
+                cause: "Gastrită erozivă, ulcer peptic, boală de reflux (BRGE).",
+                rec: "Endoscopie digestivă, inhibitori pompă protoni."
+            },
+            {
+                organ: "Pancreas", tag: "Endocrin-Metabolic", systems: ["endocrin", "digestiv"],
+                symptom: "Polidipsie (sete excesivă), poliurie, scădere ponderală bruscă.",
+                cause: "Diabet Zaharat (Tip 1/2), rezistență la insulină.",
+                rec: "Glicemie a jeun, Hemoglobină glicozilată."
+            },
+            {
+                organ: "Sistem Osos", tag: "Osteologie", systems: ["scheletic"],
+                symptom: "Dureri osoase difuze, fragilitate, fracturi la traume minore.",
+                cause: "Osteoporoză, carențe severe de Calciu/Vit D3.",
+                rec: "Osteodensitometrie (DEXA), suplimentare Ca+D3."
+            },
+            {
+                organ: "Articulații", tag: "Reumatologie", systems: ["scheletic"],
+                symptom: "Edem articular, redoare (înțepenire) matinală, durere mecanică.",
+                cause: "Artroză degenerativă, Poliartrită reumatoidă, Gută.",
+                rec: "Factor reumatoid, Radiografie, Kinetoterapie."
+            },
+            {
+                organ: "Sistem General", tag: "Metabolic", systems: ["nervos", "scheletic"],
+                symptom: "Fatigabilitate, paloare tegumentară, lipotimie (leșin).",
+                cause: "Anemie feriprivă/megaloblastică, hipotensiune.",
+                rec: "Hemoleucogramă completă, sideremie."
+            },
+            {
+                organ: "Sistem Hematologic", tag: "Coagulare", systems: ["scheletic"],
+                symptom: "Echimoze (vânătăi) spontane, gingivoragii, epistaxis.",
+                cause: "Trombocitopenie, deficite de coagulare (Vit K).",
+                rec: "Coagulogramă, consult Hematologie."
+            },
+            {
+                organ: "Ficat (Funcțional)", tag: "Metabolic / Toxicitate", systems: ["digestiv"],
+                symptom: "Astenie marcată, greață persistentă, durere în hipocondrul drept.",
+                cause: "Steatoză hepatică (ficat gras), hepatită cronică, toxicitate medicamentoasă.",
+                rec: "Transaminaze (TGO/TGP), Ecografie abdominală."
+            },
+            {
+                organ: "Ficat & Căi Biliare", tag: "Obstructiv / Icter", systems: ["digestiv"],
+                symptom: "Icter sclero-tegumentar (piele galbenă), urină hipercromă (închisă).",
+                cause: "Litiază biliară (pietre), Hepatită virală acută, obstrucție canal coledoc.",
+                rec: "Bilirubină fracționată, consult Chirurgie/Gastro."
+            },
+            {
+                organ: "Vezica Urinară", tag: "Iritație / Tract Inferior", systems: ["excretor"],
+                symptom: "Polakiurie (urinare deasă), disurie (disconfort), imperiozitate.",
+                cause: "Cistită necomplicată, iritație chimică, litiază vezicală.",
+                rec: "Sumar de urină, hidratare intensă."
+            },
+            {
+                organ: "Vezica & Rinichi", tag: "Infecțios / Acut", systems: ["excretor"],
+                symptom: "Durere suprapubiană intensă, urină tulbure/hematurie, febră.",
+                cause: "Infecție de tract urinar (ITU) severă, Pielonefrită.",
+                rec: "Urocultură cu antibiogramă, tratament antibiotic."
+            },
+            {
+                organ: "Testicule", tag: "Andrologie", systems: ["repro"],
+                symptom: "Durere scrotală acută/cronică, tumefacție locală.",
+                cause: "Epididimită, torsiune de testicul (urgență), varicocel.",
+                rec: "Ecografie testiculară, consult Urolog."
+            },
+            {
+                organ: "Sistem Reproductiv M", tag: "Hormonal / Vascular", systems: ["repro"],
+                symptom: "Disfuncție erectilă, libido scăzut, astenie sexuală.",
+                cause: "Hipogonadism (testosteron scăzut), ateroscleroză, stres psihogen.",
+                rec: "Profil hormonal masculin, consiliere."
+            },
+            {
+                organ: "Ovare / Uter", tag: "Ginecologie", systems: ["repro"],
+                symptom: "Dismenoree (dureri), cicluri neregulate, durere pelvină.",
+                cause: "Sindromul Ovarelor Polichistice (SOP), endometrioză, fibrom.",
+                rec: "Ecografie transvaginală, consult Ginecolog."
+            },
+            {
+                organ: "Zona Vaginală", tag: "Floră Microbiană", systems: ["repro"],
+                symptom: "Leucoree modificată, prurit, senzație de arsură.",
+                cause: "Candidoză, vaginoză bacteriană, dezechilibru de pH.",
+                rec: "Examen secreție vaginală, antifungice."
+            }
+        ];
+
+        const table = document.getElementById('symptomTable');
+        const noRes = document.getElementById('noResults');
+
+        function normalizeText(text) {
+            return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        }
+
+        function highlightMatch(text, queryTerms) {
+            if (!queryTerms || queryTerms.length === 0) return text;
+            let highlighted = text;
+            queryTerms.forEach(term => {
+                if (term.length < 2) return;
+                const regex = new RegExp(`(${term})`, 'gi');
+                highlighted = highlighted.replace(regex, '<span class="highlight">$1</span>');
+            });
+            return highlighted;
+        }
+
+        function renderRows(data, queryTerms = []) {
+            table.innerHTML = '';
+            if (data.length === 0) {
+                noRes.style.display = 'block';
+                return;
+            } else {
+                noRes.style.display = 'none';
+            }
+
+            data.forEach(item => {
+                const displaySymptom = highlightMatch(item.symptom, queryTerms);
+                const displayCause = highlightMatch(item.cause, queryTerms);
+                const displayOrgan = highlightMatch(item.organ, queryTerms);
+
+                const row = document.createElement('div');
+                row.className = 'symptom-row';
+                row.innerHTML = `
+                    <div class="row-organ">
+                        <span class="organ-tag">${item.tag}</span>
+                        <span class="organ-name">${displayOrgan}</span>
+                    </div>
+                    <div class="data-cell">
+                        <span class="cell-label">Simptomatologie</span>
+                        <div class="symptom-text">${displaySymptom}</div>
+                    </div>
+                    <div class="data-cell">
+                        <span class="cell-label">Etiologie Probabilă</span>
+                        <div class="cause-text">${displayCause}</div>
+                    </div>
+                    <div class="data-cell rec-cell">
+                        <span class="cell-label">Conduită Terapeutică</span>
+                        <div class="rec-text">${item.rec}</div>
+                    </div>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        renderRows(symptomsData);
+
+        function filterBySystem(system, btn) {
+            document.getElementById('searchInput').value = '';
+            
+            document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            if (system === 'all') {
+                renderRows(symptomsData);
+            } else {
+                const filtered = symptomsData.filter(item => item.systems.includes(system));
+                renderRows(filtered);
+            }
+        }
+
+        function filterByText() {
+            document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
+            
+            const rawInput = document.getElementById('searchInput').value;
+            const normalizedInput = normalizeText(rawInput);
+            
+            const searchTerms = normalizedInput.split(' ').filter(t => t.length > 0);
+            const rawTerms = rawInput.split(' ').filter(t => t.length > 0);
+
+            const filtered = symptomsData.filter(item => {
+                const normSymptom = normalizeText(item.symptom);
+                const normOrgan = normalizeText(item.organ);
+                const normCause = normalizeText(item.cause);
+                const normTag = normalizeText(item.tag);
+                
+                return searchTerms.every(term => 
+                    normSymptom.includes(term) || 
+                    normOrgan.includes(term) || 
+                    normCause.includes(term) ||
+                    normTag.includes(term)
+                );
+            });
+
+            renderRows(filtered, rawTerms);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const nav = document.getElementById('mainNav');
+            const activeLink = document.querySelector('.nav-active');
+            if (nav && activeLink) {
+                const scrollLeft = activeLink.offsetLeft - (nav.offsetWidth / 2) + (activeLink.offsetWidth / 2);
+                nav.scrollTo({ left: scrollLeft, behavior: 'auto' });
+            }
+        });
+    </script>
+</body>
+</html>
